@@ -30,10 +30,10 @@
   ],
   "subPackages": [
     {
-      "root": "pages/Engine",
+      "root": "pages/engine",
       "pages": [
         {
-          "path": "ModelView",
+          "path": "modelview",
           "style": {
             "navigationBarTitleText": "模型查看",
             "navigationStyle": "custom"

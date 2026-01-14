@@ -2,6 +2,7 @@
   "name": "uniapp-vue3-project",
   "type": "module",
   "version": "1.6.0",
+  "packageManager": "pnpm@9.15.0",
   "description": "uniapp(Vue3)",
   "keywords": [
     "Vue3",
@@ -59,6 +60,7 @@
   },
   "dependencies": {
     "mqtt": "^5.10.4",
+    "vconsole":"3.15.1",
     "crypto-js": "^4.2.0",
     "@dcloudio/uni-app": "3.0.0-4070620250821001",
     "@dcloudio/uni-app-plus": "3.0.0-4070620250821001",

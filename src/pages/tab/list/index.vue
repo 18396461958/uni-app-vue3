@@ -381,7 +381,7 @@ const showModal = (type: OpenType, record: TableItem | undefined = undefined) =>
 };
 const OnOpenFolderModel = () => {
   const folderId = getCurPathFolder().id;
-  uni.navigateTo({ url: `/pages/Engine/ModelView?folderId=${folderId}` });
+  uni.navigateTo({ url: `/pages/engine/modelview?folderId=${folderId}` });
 };
 const onRefresh = () => {
   loading.value = true;
@@ -496,7 +496,7 @@ const OpenFile = (record: TableItem) => {
       uni.showToast({ title: "文件未完成转换，无法打开", icon: 'error' });
       return;
     }
-    uni.navigateTo({ url: `/pages/Engine/ModelView?fileId=${record.uuid}` });
+    uni.navigateTo({ url: `/pages/engine/modelview?fileId=${record.uuid}` });
   }
 };
 const showDelConfirm = (record: TableItem) => {

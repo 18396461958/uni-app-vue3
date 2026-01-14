@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { postAction } from "@/api";
-import { Medusa } from "@/api/engine/engine.sdk";
+import { Medusa } from "@/static/engine.sdk";
 import mqtt from "mqtt";
 
 function randomString(length: number, chats: string) {
