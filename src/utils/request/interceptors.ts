@@ -83,7 +83,7 @@ function requestInterceptors(http: HttpRequestAbstract) {
 
       // 是否需要设置 token
       const isToken = custom?.auth === false;
-     
+
       if (getToken() && !isToken && config.header) {
         // token设置
         config.header.authorization = getToken();
@@ -124,7 +124,9 @@ function responseInterceptors(http: HttpRequestAbstract) {
     const custom = config?.custom;
     // 登录状态失效，重新登录
     if (data.code == 401) {
-      return refreshToken(http, config);
+      uni.redirectTo({
+        url: `${LOGIN_PATH}`,
+      });
     }
 
     // 隐藏loading
@@ -147,8 +149,8 @@ function responseInterceptors(http: HttpRequestAbstract) {
   }, (response: HttpError) => {
     if (response.statusCode == 401) {
       uni.redirectTo({
-            url: `${LOGIN_PATH}}`,
-          });
+        url: `${LOGIN_PATH}`,
+      });
     }
     // 自定义参数
     const custom = response.config?.custom;

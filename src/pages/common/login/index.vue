@@ -54,7 +54,7 @@ import type { CSSProperties } from 'vue';
 import uCode from 'uview-plus/components/u-code/u-code.vue';
 import { HOME_PATH, isTabBarPath, LOGIN_PATH, removeQueryString } from '@/router';
 import { setToken } from '@/utils/auth';
-import CryptoJS from "crypto-js"; 
+import CryptoJS from "crypto-js";
 import { UserApi } from '@/api';
 // import { useUserStore } from '@/store';
 
@@ -107,19 +107,18 @@ async function submit() {
   // 登录请求
   const res = await UserApi.login({
     account: {
-      account: tel.value, accountType:"Email"
+      account: tel.value, accountType: "Email"
     }, password: CryptoJS.SHA1(code.value).toString()
   }).catch(() => {
     uni.$u.toast('登录失败');
   });
+  console.log("--------------", res)
   if (!res) return;
-  // setToken('1234567890');
-  setTimeout(() => {
-    uni.$u.route({
-      type: isTabBarPath(redirect) ? 'switchTab' : 'redirectTo',
-      url: redirect,
-    });
-  }, 800);
+  setToken(res.Data.token);
+  uni.$u.route({
+    type: isTabBarPath(redirect) ? 'switchTab' : 'redirectTo',
+    url: redirect,
+  });
 }
 
 onLoad((options: any) => {

@@ -9,11 +9,6 @@
         </view>
       </view>
 
-      <!-- 关闭流按钮 - 核心功能保留，替换antd的tooltip+图标为uni原生 -->
-      <view class="action-bar" @click="OnCloseStream">
-        <view class="action-icon">×</view>
-      </view>
-
       <!-- ✅ 核心：引擎播放器容器 唯一保留的核心节点 -->
       <view id="video-webrtc"></view>
     </view>
@@ -21,12 +16,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { postAction } from "@/api";
 import { Medusa } from "@/api/engine/engine.sdk";
 import mqtt from "mqtt";
 
-function randomString(length:number, chats:string) {
+function randomString(length: number, chats: string) {
   if (!length) length = 1;
   if (!chats) chats = "0123456789qwertyuioplkjhgfdsazxcvbnm";
   let str = "";
@@ -142,8 +137,8 @@ function OnElementSelected(elementId: string, position: string) {
 function OnMeasureResult<T extends keyof MeasureType>(type: T, data: MeasureType[T]) {
   AppEvent.dispatchEvent({ type: "OnMeasureResult", MeasureType: type, data: data });
 }
-function OnGetCenterById() {}
-function OnGetCameraView() {}
+function OnGetCenterById() { }
+function OnGetCameraView() { }
 function NoElementFound() {
   console.log("NoElementFound");
 }
@@ -161,7 +156,7 @@ function NoModel(id: string) {
   loadingInfo.value = "加载模型中...";
   isLoad.value = false;
 }
-function OnGetModelList() {}
+function OnGetModelList() { }
 function OnModelProcess(modelId: string, processStr: string) {
   const process = parseFloat(processStr) * 100;
   loadProgress.value = Math.floor(process);
@@ -176,10 +171,10 @@ function OnModelProcess(modelId: string, processStr: string) {
 function OnPersonRoamPath(recordView: string) {
   AppEvent.dispatchEvent({ type: "OnPersonRoamPath", recordView: recordView });
 }
-function OnGetModelInfo() {}
-function OnCameraPos() {}
-function OnCloseToElement() {}
-function OnClickPointMarker() {}
+function OnGetModelInfo() { }
+function OnCameraPos() { }
+function OnCloseToElement() { }
+function OnClickPointMarker() { }
 
 // ========== 引擎加载核心方法 保留 ==========
 function LoadEngine() {
@@ -203,13 +198,13 @@ function LoadEngine() {
     AppEvent.dispatchEvent({ type: "OnMessageCallback", msg: msg });
   });
   // 保留核心状态回调
-  Medusa.RegisterStatusCallBack("ZoomMode", (value: string) => {});
-  Medusa.RegisterStatusCallBack("CameraMode", (value: string) => {});
-  Medusa.RegisterStatusCallBack("SetRoamPath", (value: string) => {});
+  Medusa.RegisterStatusCallBack("ZoomMode", (value: string) => { });
+  Medusa.RegisterStatusCallBack("CameraMode", (value: string) => { });
+  Medusa.RegisterStatusCallBack("SetRoamPath", (value: string) => { });
   Medusa.RegisterStatusCallBack("RoamPath", (value: string) => {
     AppEvent.dispatchEvent({ type: "OnDrawRoamPath", recordView: value });
   });
-  Medusa.RegisterStatusCallBack("GravityEnable", (value: string) => {});
+  Medusa.RegisterStatusCallBack("GravityEnable", (value: string) => { });
   Medusa.LoadEngine();
 }
 
@@ -366,6 +361,7 @@ init();
   display: flex;
   justify-content: center;
   align-items: center;
+
   &::after {
     content: "";
     width: 180rpx;
@@ -393,7 +389,7 @@ init();
 
 .action-icon {
   width: 100%;
-	height: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -402,6 +398,7 @@ init();
   border-radius: 50%;
   border: 1px solid #ff0000;
   box-sizing: border-box;
+
   &:active {
     background-color: rgba(172, 39, 39, 0.2);
   }
