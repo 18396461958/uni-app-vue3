@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref,onUnmounted,onMounted } from "vue";
 import { postAction } from "@/api";
 import { Medusa } from "@/static/engine.sdk";
 import mqtt from "mqtt";
@@ -85,6 +85,12 @@ function OnEngineLoaded() {
   );
 }
 
+onUnmounted(()=>{
+  OnCloseStream()
+})
+onMounted(()=>{
+  init();
+})
 // 关闭流核心方法 保留
 function OnCloseStream() {
   postAction("/Engine/CloseStream", { value: engineInfo.engineId }).then((res) => {
@@ -245,7 +251,10 @@ const init = async () => {
   // 心跳保活
   setInterval(() => {
     postAction("/Engine/KeepliveStream", { value: engineInfo.engineId }).then((res) => {
-      console.log(res);
+      console.log("--------------------",res);
+    }).catch(()=>{
+      OnCloseStream();
+        init();
     });
   }, 30000);
 
@@ -308,7 +317,6 @@ const init = async () => {
     console.log(err);
   });
 };
-init();
 </script>
 
 <style lang="scss" scoped>
