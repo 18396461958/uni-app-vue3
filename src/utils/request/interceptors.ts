@@ -8,6 +8,7 @@ import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
 import storage from '@/utils/storage';
 import { showMessage } from './status';
+import { LOGIN_PATH } from '@/router';
 
 // 重试队列，每一项将是一个待执行的函数形式
 let requestQueue: (() => void)[] = [];
@@ -27,7 +28,7 @@ const repeatSubmit = (config: HttpRequestConfig) => {
     const s_url = sessionObj.url; // 请求地址
     const s_data = sessionObj.data; // 请求数据
     const s_time = sessionObj.time; // 请求时间
-    const interval = 1000; // 间隔时间(ms)，小于此时间视为重复提交
+    const interval = 100; // 间隔时间(ms)，小于此时间视为重复提交
     if (s_data === requestObj.data && requestObj.time - s_time < interval && s_url === requestObj.url) {
       const message = '数据正在处理，请勿重复提交';
       console.warn(`[${s_url}]: ${message}`);
@@ -82,8 +83,10 @@ function requestInterceptors(http: HttpRequestAbstract) {
 
       // 是否需要设置 token
       const isToken = custom?.auth === false;
+     
       if (getToken() && !isToken && config.header) {
         // token设置
+        config.header.authorization = getToken();
         config.header.token = getToken();
       }
 
@@ -113,14 +116,14 @@ function responseInterceptors(http: HttpRequestAbstract) {
    */
   http.interceptors.response.use((response: HttpResponse) => {
     /* 对响应成功做点什么 可使用async await 做异步操作 */
+    // 登录状态失效，重新登录
     const data = response.data;
     // 配置参数
     const config = response.config;
     // 自定义参数
     const custom = config?.custom;
-
     // 登录状态失效，重新登录
-    if (data.code === 401) {
+    if (data.code == 401) {
       return refreshToken(http, config);
     }
 
@@ -142,6 +145,11 @@ function responseInterceptors(http: HttpRequestAbstract) {
     // 请求失败则抛出错误
     return Promise.reject(data);
   }, (response: HttpError) => {
+    if (response.statusCode == 401) {
+      uni.redirectTo({
+            url: `${LOGIN_PATH}}`,
+          });
+    }
     // 自定义参数
     const custom = response.config?.custom;
 

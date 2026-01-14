@@ -4,9 +4,9 @@
       <view class="title">
         欢迎登录
       </view>
-      <input v-model="tel" class="u-border-bottom" type="number" placeholder="请输入手机号">
+      <input v-model="tel" class="u-border-bottom" placeholder="请输入账号">
       <view class="u-border-bottom my-40rpx flex">
-        <input v-model="code" class="flex-1" type="number" placeholder="请输入验证码">
+        <input v-model="code" class="flex-1" placeholder="请输入密码">
         <view>
           <u-code ref="uCodeRef" @change="codeChange" />
           <u-button :text="tips" type="success" size="mini" @click="getCode" />
@@ -54,10 +54,12 @@ import type { CSSProperties } from 'vue';
 import uCode from 'uview-plus/components/u-code/u-code.vue';
 import { HOME_PATH, isTabBarPath, LOGIN_PATH, removeQueryString } from '@/router';
 import { setToken } from '@/utils/auth';
+import CryptoJS from "crypto-js"; 
+import { UserApi } from '@/api';
 // import { useUserStore } from '@/store';
 
 // const userStore = useUserStore();
-const tel = ref<string>('18502811111');
+const tel = ref<string>('mqwang@digitwinstech.com');
 const code = ref<string>('1234');
 const tips = ref<string>();
 const uCodeRef = ref<InstanceType<typeof uCode> | null>(null);
@@ -94,20 +96,24 @@ function getCode() {
   }
 }
 async function submit() {
-  if (!uni.$u.test.mobile(Number(tel.value))) {
-    uni.$u.toast('请输入正确的手机号');
-    return;
-  }
+  // if (!uni.$u.test.mobile(Number(tel.value))) {
+  //   uni.$u.toast('请输入正确的手机号');
+  //   return;
+  // }
   if (!code.value) {
     uni.$u.toast('请输入验证码');
     return;
   }
   // 登录请求
-  // const res = await userStore.login({ phone: tel.value, code: code.value }).catch(() => {
-  //   uni.$u.toast('登录失败');
-  // });
-  // if (!res) return;
-  setToken('1234567890');
+  const res = await UserApi.login({
+    account: {
+      account: tel.value, accountType:"Email"
+    }, password: CryptoJS.SHA1(code.value).toString()
+  }).catch(() => {
+    uni.$u.toast('登录失败');
+  });
+  if (!res) return;
+  // setToken('1234567890');
   setTimeout(() => {
     uni.$u.route({
       type: isTabBarPath(redirect) ? 'switchTab' : 'redirectTo',

@@ -90,8 +90,8 @@
           {{ rootPath.name }}
         </view>
         <!-- 路径面包屑循环 -->
-        <view class="path-node-root" v-for="(item, index) in paths">
-          <text>>></text>
+        <view class="flex" v-for="(item, index) in paths">
+          <text>/</text>
           <view @click="() => RefreshPath(item)" class="path-node" style="margin:0 4px;">
             {{ item.name }}
           </view>
@@ -100,7 +100,7 @@
 
       <!-- 右侧操作按钮组【紧凑间距】 -->
       <view class="flex items-center flex-wrap">
-        <view @click="showModal(OpenType.NewFolder)"
+        <!-- <view @click="showModal(OpenType.NewFolder)"
           class="h-[28px] px-2 text-[12px] action-button text-[#515A6E] action-button1 flex items-center border border-solid border-[#DCDEE2] rounded-[2px] mr-1 mb-1">
           <text style="font-size:12px; margin-right: 3px;">📁</text>
           新建
@@ -109,7 +109,7 @@
           class="h-[28px] px-2 text-[12px] action-button text-[#515A6E] action-button1 flex items-center border border-solid border-[#DCDEE2] rounded-[2px] mr-1 mb-1">
           <text style="font-size:12px; margin-right: 3px;">⬆️</text>
           上传
-        </view>
+        </view> -->
         <!-- 排序下拉紧凑版 -->
         <view class="custom-select sort-select" style="height:28px;margin-left:2px;"
           @click="sortSelectShow = !sortSelectShow">
@@ -130,16 +130,16 @@
       <view v-if="loading" class="loading-wrap"><text class="loading-icon">♻️</text> 加载中...</view>
       <view class="custom-table bordered" v-else>
         <view class="table-tr th">
-          <view class="table-td">名称</view>
+          <view class="table-td" style="flex:4">名称</view>
           <!-- <view class="table-td" style="width: 120px;">日期</view>
           <view class="table-td" style="width: 80px;">类型</view>
           <view class="table-td" style="width: 80px;">大小</view> -->
           <!-- 原状态列 表头注释掉 -->
-          <!-- <view class="table-td" style="width: 20px;">状态</view> -->
-          <view class="table-td" style="width: 180px;">操作</view>
+          <view class="table-td" style="width: 20px;">状态</view>
+          <!-- <view class="table-td" style="width: 180px;">操作</view> -->
         </view>
         <view class="table-tr" v-for="(record, index) in data" :key="record.key">
-          <view class="table-td">
+          <view class="table-td" style="flex:4">
             <view class="flex items-center action-button" @click="OpenFile(record)">
               {{ record.name }}
               <!-- ✅ 核心修改：状态标签全部跟随名称后方展示 -->
@@ -150,7 +150,7 @@
                 文件夹
               </view>
               <!-- 文件状态 紧凑标签 -->
-              <view class="tag-item default ml-2" v-if="record.status === 'UnStarted' && record.size != '-'"
+              <!-- <view class="tag-item default ml-2" v-if="record.status === 'UnStarted' && record.size != '-'"
                 style="display:flex;align-items:center;justify-content:center;padding:1px 4px;border-radius:2px;font-size:11px;">
                 <text style="font-size:10px; margin-right:2px;">⭕</text>
                 未开始
@@ -173,14 +173,14 @@
                 style="display:flex;align-items:center;justify-content:center;padding:1px 4px;border-radius:2px;font-size:11px;">
                 <text style="font-size:10px; margin-right:2px;">❌</text>
                 失败
-              </view>
+              </view> -->
             </view>
           </view>
           <!-- <view class="table-td">{{ record.date }}</view>
           <view class="table-td">{{ record.type }}</view>
           <view class="table-td">{{ record.size }}</view> -->
           <!-- ✅ 核心修改：原独立状态列 整段注释掉 -->
-          <!-- <view class="table-td">
+          <view class="table-td">
             <view class="tag-item default" v-if="record.status === 'UnStarted'"
               style="display:flex;align-items:center;justify-content:center;padding:1px 4px;border-radius:2px;font-size:11px;">
               <text style="font-size:10px; margin-right:2px;">⭕</text>
@@ -206,9 +206,9 @@
               <text style="font-size:10px; margin-right:2px;">❌</text>
               失败
             </view>
-          </view> -->
+          </view>
           <!-- 操作列【极致紧凑按钮】 -->
-          <view class="table-td">
+          <!-- <view class="table-td">
             <view class="flex items-center justify-start flex-wrap">
               <view v-if="record.size != '-'" @click="ConvertFile(record)" class="action-btn mr-1 mb-1">转换</view>
               <view v-if="record.size != '-'" @click="AdvancedConvert(record)" class="action-btn mr-1 mb-1">高级</view>
@@ -216,7 +216,7 @@
               <view @click="showModal(OpenType.NewFolder, record)" class="action-btn mr-1 mb-1">重命名</view>
               <view @click="showDelConfirm(record)" class="action-btn danger mr-1 mb-1">删除</view>
             </view>
-          </view>
+          </view> -->
         </view>
       </view>
     </view>

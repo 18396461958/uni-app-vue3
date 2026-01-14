@@ -58,6 +58,8 @@
     "clean:cache": "npx rimraf node_modules/.cache"
   },
   "dependencies": {
+    "mqtt": "^5.10.4",
+    "crypto-js": "^4.2.0",
     "@dcloudio/uni-app": "3.0.0-4070620250821001",
     "@dcloudio/uni-app-plus": "3.0.0-4070620250821001",
     "@dcloudio/uni-components": "3.0.0-4070620250821001",
@@ -72,6 +74,7 @@
     "z-paging": "^2.8.8"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@antfu/eslint-config": "5.0.0",
     "@dcloudio/types": "^3.4.28",
     "@dcloudio/uni-automator": "3.0.0-4070620250821001",

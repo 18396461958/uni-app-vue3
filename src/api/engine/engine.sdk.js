@@ -223,80 +223,47 @@ export class Medusa {
       }
     }
 
-    if (!existFlag) {
-      var header = document.getElementsByTagName("head")[0];
-      let loadCount = 0;
-      res.forEach((e) => {
-        let src;
-        if (e.type == "js") {
-          src = document.createElement("script");
-          src.setAttribute("src", e.src);
-        } else {
-          src = document.createElement("link");
-          src.setAttribute("rel", "stylesheet");
-          src.setAttribute("href", e.src);
-        }
-        header.appendChild(src);
+    const header = document.getElementsByTagName("head")[0];
+    let loadCount = 0;
+    // Remove previously loaded scripts and styles
+    res.forEach((e) => {
+      let selector = e.type === "js" ? `script[src="${e.src}"]` : `link[href="${e.src}"]`;
+      let existingElement = header.querySelector(selector);
 
-        // 对于浏览器的判断是ie还是其他
-        if (!(!!window.ActiveXObject || "ActiveXObject" in window)) {
-          src.onload = function() {
+      if (existingElement) {
+        header.removeChild(existingElement); // Remove the existing script or link
+      }
+    });
+
+    // Now we can load new scripts/styles
+    res.forEach((e) => {
+      let src;
+      if (e.type === "js") {
+        src = document.createElement("script");
+        src.setAttribute("src", e.src);
+      } else {
+        src = document.createElement("link");
+        src.setAttribute("rel", "stylesheet");
+        src.setAttribute("href", e.src);
+      }
+
+      header.appendChild(src);
+
+      // Check for browser type to handle loading
+      if (!(!!window.ActiveXObject || "ActiveXObject" in window)) {
+        src.onload = function() {
+          loadCount++;
+          if (loadCount === res.length && cbFun) cbFun();
+        };
+      } else {
+        src.onreadystatechange = function() {
+          if (src.readyState === "loaded" || src.readyState === "complete") {
             loadCount++;
-            if (loadCount == res.length && cbFun) cbFun();
-          };
-        } else {
-          src.onreadystatechange = function() {
-            if (src.readystate == "loaded" || src.readState == "complate") {
-              loadCount++;
-              if (loadCount == res.length && cbFun) cbFun();
-            }
-          };
-        }
-      });
-    }
-
-    // 本项目无需切换路由，此处重复代码导致引擎重复加载
-    // var header = document.getElementsByTagName("head")[0];
-    // let loadCount = 0;
-    // // Remove previously loaded scripts and styles
-    // res.forEach((e) => {
-    //   let selector = e.type === "js" ? `script[src="${e.src}"]` : `link[href="${e.src}"]`;
-    //   let existingElement = header.querySelector(selector);
-
-    //   if (existingElement) {
-    //     header.removeChild(existingElement); // Remove the existing script or link
-    //   }
-    // });
-
-    // // Now we can load new scripts/styles
-    // res.forEach((e) => {
-    //   let src;
-    //   if (e.type === "js") {
-    //     src = document.createElement("script");
-    //     src.setAttribute("src", e.src);
-    //   } else {
-    //     src = document.createElement("link");
-    //     src.setAttribute("rel", "stylesheet");
-    //     src.setAttribute("href", e.src);
-    //   }
-
-    //   header.appendChild(src);
-
-    //   // Check for browser type to handle loading
-    //   if (!(!!window.ActiveXObject || "ActiveXObject" in window)) {
-    //     src.onload = function() {
-    //       loadCount++;
-    //       if (loadCount === res.length && cbFun) cbFun();
-    //     };
-    //   } else {
-    //     src.onreadystatechange = function() {
-    //       if (src.readyState === "loaded" || src.readyState === "complete") {
-    //         loadCount++;
-    //         if (loadCount === res.length && cbFun) cbFun();
-    //       }
-    //     };
-    //   }
-    // });
+            if (loadCount === res.length && cbFun) cbFun();
+          }
+        };
+      }
+    });
   }
 
   /** 以下为静态成员 */
@@ -327,16 +294,16 @@ export class Medusa {
    */
   static LoadEngine() {
     let resources = [
-      { name: "jquery-3.7.1.min.js", type: "js", src: "/medusa/jquery-3.7.1.min.js" },
-      { name: "adapter-7.4.0.min.js", type: "js", src: "/medusa/adapter-7.4.0.min.js" },
-      { name: "srs.sdk.js", type: "js", src: "/medusa/srs.sdk.js" },
-      { name: "winlin.utility.js", type: "js", src: "/medusa/winlin.utility.js" },
-      { name: "srs.page.js", type: "js", src: "/medusa/srs.page.js" },
-      { name: "mqtt.min.js", type: "js", src: "/medusa/mqtt.min.js" }
+      { name: "jquery-3.7.1.min.js", type: "js", src: "/static/medusa/jquery-3.7.1.min.js" },
+      { name: "adapter-7.4.0.min.js", type: "js", src: "/static/medusa/adapter-7.4.0.min.js" },
+      { name: "srs.sdk.js", type: "js", src: "/static/medusa/srs.sdk.js" },
+      { name: "winlin.utility.js", type: "js", src: "/static/medusa/winlin.utility.js" },
+      { name: "srs.page.js", type: "js", src: "/static/medusa/srs.page.js" },
+      { name: "mqtt.min.js", type: "js", src: "/static/medusa/mqtt.min.js" }
     ].concat(
       this.isMobileDevice() || this.isTouchDevice()
-        ? [{ name: "medusa.engine.phone.js", type: "js", src: "/medusa/medusa.engine.phone.js" }]
-        : [{ name: "medusa.engine.js", type: "js", src: "/medusa/medusa.engine.js" }]
+        ? [{ name: "medusa.engine.phone.js", type: "js", src: "/static/medusa/medusa.engine.phone.js" }]
+        : [{ name: "medusa.engine.js", type: "js", src: "/static/medusa/medusa.engine.js" }]
     );
     this.#loadScript(resources, this.#ResponseEvents.OnEngineLoaded);
   }

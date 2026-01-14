@@ -30,6 +30,18 @@
   ],
   "subPackages": [
     {
+      "root": "pages/Engine",
+      "pages": [
+        {
+          "path": "ModelView",
+          "style": {
+            "navigationBarTitleText": "模型查看",
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
       "root": "pages/common",
       "pages": [
         {
