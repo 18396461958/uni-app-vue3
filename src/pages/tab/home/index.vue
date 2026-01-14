@@ -100,7 +100,7 @@ async function getRecentFiles() {
  */
 function OpenFile(record: Record) {
     uni.navigateTo({
-        url: `/pages/engine/modelview2?fileId=${record.uuid}`,
+        url: `/pages/engine/modelview?fileId=${record.uuid}`,
         success: () => console.log('导航成功'),
         fail: (err) => console.error('导航失败:', err)
     });
