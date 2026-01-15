@@ -27,6 +27,9 @@ onHide(() => {
 
 <style lang="scss">
 /* 每个页面公共css */
-
-@import '@/static/styles/common.scss';
+page {
+  font-size: $u-font-base;
+  color: $u-main-color;
+  background-color: $u-bg-color;
+}
 </style>
