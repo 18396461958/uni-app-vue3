@@ -2,6 +2,9 @@
 window.closeServe = function() {
   if (sdk) {
     sdk.close();
+    startDistance = null;
+    scaleFactor = null;
+    lastExecutionTime = null
   }
 };
 
@@ -118,7 +121,7 @@ function medusa_mqtt_connect(hostname, port, clientId) {
   client.onConnectionLost = onConnectionLost;
   client.onMessageArrived = onMessageArrived;
   // connect the client
-  let uris = null;
+  window.uris = null;
   if (window.appConfig && window.appConfig.engineAgent) {
     uris = ["ws://" + hostname + ":" + port + "/dp_engine/mqtt"]
   }
@@ -171,8 +174,8 @@ function medusa_publish(x, y) {
       client.send(message);
   }
 }
-let startDistance = 0; // 起始距离
-let scaleFactor = 1; // 当前缩放因子
+window.startDistance = 0; // 起始距离
+window.scaleFactor = 1; // 当前缩放因子
 
 function getDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
@@ -305,8 +308,8 @@ function mousemove(event) {
   }
 }
 
-let lastExecutionTime = 0; // 记录上一次执行的时间  
-const executionLimit = 1000 / 6; // 每秒最多执行3次  
+window.lastExecutionTime = 0; // 记录上一次执行的时间  
+window.executionLimit = 1000 / 6; // 每秒最多执行3次  
 
 function mousewheel(event, startDistance) {  
   const currentTime = Date.now(); // 获取当前时间  
@@ -417,7 +420,7 @@ function ConnectServer(renderAddress, dataChannelAddress) {
       button.textContentFlag = false;
     }
   };
-  let flagButton = localStorage.getItem("preViewMode");
+  window.flagButton = localStorage.getItem("preViewMode");
   if(flagButton){
       // 创建按钮元素
   const button2 = document.createElement("button");
@@ -455,9 +458,9 @@ function ConnectServer(renderAddress, dataChannelAddress) {
   DT_DivWidth = DT_container.clientWidth;
   DT_DivHeight = DT_container.clientHeight;
   // console.log(DT_container.clientWidth);
-  let touchstart = throttle(mousedown, 5);
-  let touchend = throttle(mouseup, 1);
-  let touchmove = throttle(mousemove, 5);
+  window.touchstart = throttle(mousedown, 5);
+  window.touchend = throttle(mouseup, 1);
+  window.touchmove = throttle(mousemove, 5);
   DT_container.addEventListener(
     "touchstart",
     (e) => {
