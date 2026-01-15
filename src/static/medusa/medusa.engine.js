@@ -2,6 +2,7 @@
 window.closeServe = function () {
   if (sdk) {
     sdk.close();
+    up_track = null;
   }
 };
 function utf8ArrayToString(array) {
@@ -140,7 +141,10 @@ function SendMessage(info) {
   if (strs[0] == "StopMeasure") DT_bMeasure = false;	// 如果开始测量关闭状态
   // console.log("client msg:"+msg);
   message.destinationName = DT_ChannelName;
-  client.send(message);
+
+  if (client && client.isConnected()) {
+      client.send(message);
+  }
 }
 
 function medusa_publish(x, y) {
@@ -148,7 +152,9 @@ function medusa_publish(x, y) {
   var message = new Paho.Message(msg);
   // console.log("client msg:"+msg);
   message.destinationName = DT_ChannelName;
-  client.send(message);
+  if (client && client.isConnected()) {
+      client.send(message);
+  }
 }
 function getPixelScale()
 {
@@ -167,7 +173,9 @@ function mousedown(event) {
     var message = new Paho.Message(msg);
     // console.log("client msg:"+msg);
     message.destinationName = DT_ChannelName;
-    client.send(message);
+    if (client && client.isConnected()) {
+      client.send(message);
+  }
     // DT_cPoint = event;
   }
   if (event.type = "mousedown" && event.button == 1) {
@@ -177,7 +185,9 @@ function mousedown(event) {
     var message = new Paho.Message(msg);
     // console.log("client msg:"+msg);
     message.destinationName = DT_ChannelName;
-    client.send(message);
+    if (client && client.isConnected()) {
+      client.send(message);
+  }
     // DT_cPoint = event;
   }
   // console.log();
@@ -186,12 +196,14 @@ function mousedown(event) {
   // var message = new Paho.Message(msg);
   // //console.log("client msg:"+msg);
   // message.destinationName = DT_ChannelName;
-  // client.send(message);
+  // if (client && client.isConnected()) {
+     // client.send(message);
+  //}
 
   // console.log(event);
 }
 
-let up_track ={
+window.up_track ={
   time:0,
   msg:""
 }
@@ -217,7 +229,9 @@ function mouseup(event) {
     }
     up_track.time = new Date().getTime();
     up_track.msg = msg;
-    client.send(message);
+    if (client && client.isConnected()) {
+      client.send(message);
+  }
     // var disX = Math.abs(DT_cPoint.clientX-(event.clientX-DT_container.offsetLeft));
     // var disY = Math.abs(DT_cPoint.clientY-(event.clientY-DT_container.offsetTop));
 
@@ -234,7 +248,9 @@ function mouseup(event) {
     var message = new Paho.Message(msg);
     // console.log("client msg:"+msg);
     message.destinationName = DT_ChannelName;
-    client.send(message);
+    if (client && client.isConnected()) {
+      client.send(message);
+  }
     // var disX = Math.abs(DT_cPoint.clientX-(event.clientX-DT_container.offsetLeft));
     // var disY = Math.abs(DT_cPoint.clientY-(event.clientY-DT_container.offsetTop));
 
@@ -248,7 +264,9 @@ function mouseup(event) {
   // var message = new Paho.Message(msg);
   // //console.log("client msg:"+msg);
   // message.destinationName = DT_ChannelName;
-  // client.send(message);
+  // if (client && client.isConnected()) {
+      //client.send(message);
+  //}
 }
 
 
@@ -262,17 +280,23 @@ function mousemove(event) {
     
     let message = new Paho.Message(msg);
     message.destinationName = DT_ChannelName;
-    client.send(message);
+    if (client && client.isConnected()) {
+      client.send(message);
+  }
   } else if (DT_bRighttDown && event.type == "mousemove") {
     let msg = `OnRMouseMove_${(event.clientX - offsetData.left) * getPixelScale() * DT_RenderWidth / DT_DivWidth}_${(event.clientY - offsetData.top) * getPixelScale() * DT_RenderHeight / DT_DivHeight}`;
     let message = new Paho.Message(msg);
     message.destinationName = DT_ChannelName;
-    client.send(message);
+    if (client && client.isConnected()) {
+      client.send(message);
+  }
   } else if (DT_bMeasure) {
     let msg = `OnLMouseMove_${(event.clientX - offsetData.left) * getPixelScale() * DT_RenderWidth / DT_DivWidth}_${(event.clientY - offsetData.top) * getPixelScale() * DT_RenderHeight / DT_DivHeight}`;
     let message = new Paho.Message(msg);
     message.destinationName = DT_ChannelName;
-    client.send(message);
+    if (client && client.isConnected()) {
+      client.send(message);
+  }
   }
   // console.log(event);
 }
@@ -285,7 +309,9 @@ function mousewheel(event) {
   var message = new Paho.Message(msg);
   // console.log("client msg:"+msg);
   message.destinationName = DT_ChannelName;
-  client.send(message);
+  if (client && client.isConnected()) {
+      client.send(message);
+  }
 
   // bRenderFinish= false;
 

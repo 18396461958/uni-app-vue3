@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onUnmounted, onMounted } from "vue";
+import { ref,reactive, onUnmounted, onMounted } from "vue";
 import { postAction } from "@/api";
 import { Medusa } from "@/static/engine.sdk";
 import { AppEvent, MeasureType } from "@/api/engine/AppEvent";
@@ -92,7 +92,7 @@ const params = url.split("?")[1]?.replace(" ", "").split("&") || [];
 let models: string[] = [];
 let uuid = "";
 
-let engineInfo = {
+const engineInfo = reactive({
   whep: "http://220.196.62.226:1985/rtc/v1/whep/",
   app: "app",
   mqttWs: "ws://220.196.62.226:30022/mqtt",
@@ -102,13 +102,17 @@ let engineInfo = {
   channelIp: "",
   new: true,
   code: 0,
-};
+});
 function backHome(){
   uni.switchTab({
     url: HOME_PATH
   })
 }
 function OnEngineLoaded() {
+  if(!engineInfo.webrtc){
+    setTimeout(()=>{OnEngineLoaded()},200)
+    return
+  }
   Medusa.InitEngine(
     "video-webrtc",
     `${engineInfo.webrtc}/${engineInfo.engineId}`,
@@ -118,6 +122,7 @@ function OnEngineLoaded() {
 
 // 页面卸载：销毁所有定时器+关闭MQTT连接+关闭流
 onUnmounted(() => {
+  Medusa.RemoveAllEvent();
   OnCloseStream()
   if (mqttHandshakeTimer) {
     clearInterval(mqttHandshakeTimer);
@@ -128,17 +133,24 @@ onUnmounted(() => {
     heartbeatTimer = null; // 同时重置定时器
   }
   if (mqttClient && mqttClient.isConnected()) {
+    mqttClient.unsubscribe(engineInfo.engineId); // 取消订阅
     mqttClient.disconnect();
+    mqttClient.stopTrace();
+    mqttClient.onMessageArrived = null;
   }
   // ✅ 必加：重置MQTT实例为null，彻底销毁旧实例引用
   mqttClient = null;
+    // 获取head中所有src包含 "static/medusa" 的script标签，批量移除
+  document.querySelectorAll('head script[src*="static/medusa"]').forEach(script => {
+    script.remove();
+  });
 })
 
 
 
 function OnCloseStream() {
   postAction("/Engine/CloseStream", { value: engineInfo.engineId }).then((res) => {
-    uni.redirectTo({ url: "/pages/model/Explorer" });
+    //uni.redirectTo({ url: "/pages/model/Explorer" });
   });
 }
 
@@ -255,7 +267,7 @@ function LoadEngine() {
 }
 
 const init = async () => {
-  Medusa.LoadEngine();
+    Medusa.LoadEngine();
   // 解析url参数
   for (let i = 0; i < params.length; i++) {
     const param = params[i].split("=");
@@ -275,7 +287,10 @@ const init = async () => {
 
   // 打开引擎流
   const openRes = await postAction("/Engine/OpenStream", { value: uuid });
-  engineInfo = openRes.Data as any;
+  Object.keys(openRes.Data).forEach((key)=>{
+    engineInfo[key] = openRes.Data[key]
+  })
+
   if (engineInfo.code < 0) {
     uni.showModal({
       title: "提示",
@@ -312,7 +327,7 @@ const init = async () => {
       confirmText: "确定",
       cancelText: "取消",
       success: () => {
-        uni.redirectTo({ url: "/pages/model/Explorer" });
+        //uni.redirectTo({ url: "/pages/model/Explorer" });
       },
     });
     return;
@@ -383,7 +398,7 @@ const init = async () => {
   // ========== ↑↑↑ 【Paho MQTT 适配结束】 ↑↑↑ ==========
 };
 
-init();
+onMounted(()=>{init();})
 </script>
 
 <style lang="scss" scoped>

@@ -213,18 +213,23 @@ export class Medusa {
   }
 
   static #loadScript(res, cbFun) {
+    // 获取head中所有src包含 "static/medusa" 的script标签，批量移除
+
     let dom = document.getElementsByTagName("script");
-    let existFlag = false;
+
     // Remove previously loaded scripts/styles
     for (let i = 0; i < dom.length; i++) {
-      if (dom[i].src.includes(res[0].name)) {
-        existFlag = true;
-        break;
-      }
+      const currentSrc = dom[i].src || dom[i].href;
+      res.forEach((item) => {
+        if (currentSrc && currentSrc.includes(item.name)) {
+          dom[i].parentNode.removeChild(dom[i]); // Remove the existing script
+        }
+      });
     }
 
-    const header = document.getElementsByTagName("head")[0];
+    var header = document.getElementsByTagName("head")[0];
     let loadCount = 0;
+
     // Remove previously loaded scripts and styles
     res.forEach((e) => {
       let selector = e.type === "js" ? `script[src="${e.src}"]` : `link[href="${e.src}"]`;
@@ -234,7 +239,6 @@ export class Medusa {
         header.removeChild(existingElement); // Remove the existing script or link
       }
     });
-
     // Now we can load new scripts/styles
     res.forEach((e) => {
       let src;
@@ -248,6 +252,7 @@ export class Medusa {
       }
 
       header.appendChild(src);
+
 
       // Check for browser type to handle loading
       if (!(!!window.ActiveXObject || "ActiveXObject" in window)) {
@@ -280,6 +285,12 @@ export class Medusa {
     }
   }
 
+  static RemoveAllEvent() {
+    for(let key of Object.keys(this.#ResponseEvents)){
+      this.#ResponseEvents[key] = void 0;
+    }
+  }
+
   static SetPreViewMode(params) {
     if (params == true) {
       localStorage.setItem("preViewMode", true);
@@ -292,7 +303,7 @@ export class Medusa {
   /**
    * 用于加载引擎文件，可以在页面初始化后进行调研，预先加载相关的引擎文件
    */
-  static LoadEngine() {
+  static LoadEngine(call) {
     let resources = [
       { name: "jquery-3.7.1.min.js", type: "js", src: "/static/medusa/jquery-3.7.1.min.js" },
       { name: "adapter-7.4.0.min.js", type: "js", src: "/static/medusa/adapter-7.4.0.min.js" },
@@ -305,7 +316,19 @@ export class Medusa {
         ? [{ name: "medusa.engine.phone.js", type: "js", src: "/static/medusa/medusa.engine.phone.js" }]
         : [{ name: "medusa.engine.js", type: "js", src: "/static/medusa/medusa.engine.js" }]
     );
-    this.#loadScript(resources, this.#ResponseEvents.OnEngineLoaded);
+    window.MessageReceived = null;
+    window.closeServe && window.closeServe();
+    this.#loadScript(resources,call|| this.#ResponseEvents.OnEngineLoaded);
+  }
+
+  static ConnectServer(StreamServerUrl,CmdServerUrl){
+    if(!window.ConnectServer){
+      setTimeout(()=>{
+        this.ConnectServer(StreamServerUrl,CmdServerUrl)
+      },200)
+      return
+    }
+    window.ConnectServer(StreamServerUrl,CmdServerUrl)
   }
 
   /**
@@ -432,7 +455,7 @@ export class Medusa {
           } else if (cmd == "OnModelProcess") {
             this.#ResponseEvents.OnModelProcess(receiveArray[1], receiveArray[2]);
             if (receiveArray[2] >= 1) {
-              this.#ResponseEvents.OnModelLoaded(receiveArray[1], receiveArray[2]);
+              this.#ResponseEvents.OnModelLoaded && this.#ResponseEvents.OnModelLoaded(receiveArray[1], receiveArray[2]);
             }
           } else if (cmd == "ModelList") {
             // ModelList_tag1_tag2，用_隔开的内容为多个模型的tag
@@ -582,7 +605,7 @@ export class Medusa {
       // let tmpCmds = this.#EngineConfiguration.CmdServerUrl.replace("tcp://", "").split("/");
       // let streamUrl = `${this.#EngineConfiguration.StreamServerUrl.replace(tmpStreams[0], location.host)}?play=/dp_engine/rtc/v1/play&streamUrl=${this.#EngineConfiguration.StreamServerUrl}`;
       // let cmdUrl = this.#EngineConfiguration.CmdServerUrl.replace(tmpCmds[0], location.host);
-      ConnectServer(this.#EngineConfiguration.StreamServerUrl, this.#EngineConfiguration.CmdServerUrl);
+      this.ConnectServer(this.#EngineConfiguration.StreamServerUrl, this.#EngineConfiguration.CmdServerUrl);
     }
     else if (location.protocol === "https:") {
       // HTTPS 则需要先授权信任
@@ -684,11 +707,11 @@ export class Medusa {
         });
 
         if (certAvailable) {
-          ConnectServer(this.#EngineConfiguration.StreamServerUrl, this.#EngineConfiguration.CmdServerUrl);
+          this.ConnectServer(this.#EngineConfiguration.StreamServerUrl, this.#EngineConfiguration.CmdServerUrl);
         }
       });
     } else {
-      ConnectServer(this.#EngineConfiguration.StreamServerUrl, this.#EngineConfiguration.CmdServerUrl);
+      this.ConnectServer(this.#EngineConfiguration.StreamServerUrl, this.#EngineConfiguration.CmdServerUrl);
     }
     // ConnectServer("webrtc://220.196.62.226/live/render0", "tcp://220.196.62.226:30007/channel0")
   }
