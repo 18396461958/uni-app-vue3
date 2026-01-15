@@ -1,6 +1,16 @@
 <template>
   <view class="view-root">
     <view class="view-container">
+      <image src="/static/images/icon_arrow_down@2x.png" alt="" style="height: 30px;width: 30px;border-radius: 40px; z-index: 9999;
+            position: absolute;
+            top:20px;
+            left: 20px;
+            cursor: pointer;" @click="backHome" />
+      <image src="/static/images/icon_nav_full@2x.png" alt="" style="height: 30px;width: 30px;border-radius: 40px; z-index: 9999;
+            position: absolute;
+            top:20px;
+            right: 20px;
+            cursor: pointer;" @click="fullScreen" />
       <view class="d-progress" v-if="isLoad">
         <view class="progress-circle" :style="{ '--percent': loadProgress }"></view>
         <view class="loading-text">
@@ -8,6 +18,7 @@
         </view>
       </view>
       <view id="video-webrtc"></view>
+
     </view>
   </view>
 </template>
@@ -17,11 +28,24 @@ import { ref, onUnmounted, onMounted } from "vue";
 import { postAction } from "@/api";
 import { Medusa } from "@/static/engine.sdk";
 import { AppEvent, MeasureType } from "@/api/engine/AppEvent";
+import { HOME_PATH } from "@/router";
 
 // ✅ 关键：解决TS报错，声明全局Paho对象，无需安装任何依赖
 declare global {
   interface Window {
     Paho: any;
+  }
+}
+const screenFullState = ref("no_full");
+
+function fullScreen() {
+  let doc = document.querySelector("#app");
+  if (doc && !document.fullscreenElement) {
+    doc.requestFullscreen();
+    screenFullState.value = "full";
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen();
+    screenFullState.value = "no_full";
   }
 }
 
@@ -79,7 +103,11 @@ let engineInfo = {
   new: true,
   code: 0,
 };
-
+function backHome(){
+  uni.switchTab({
+    url: HOME_PATH
+  })
+}
 function OnEngineLoaded() {
   Medusa.InitEngine(
     "video-webrtc",
@@ -105,9 +133,8 @@ onUnmounted(() => {
   // ✅ 必加：重置MQTT实例为null，彻底销毁旧实例引用
   mqttClient = null;
 })
-onMounted(() => {
-  init();
-})
+
+
 
 function OnCloseStream() {
   postAction("/Engine/CloseStream", { value: engineInfo.engineId }).then((res) => {
@@ -264,7 +291,7 @@ const init = async () => {
   heartbeatTimer = setInterval(() => {
     postAction("/Engine/KeepliveStream", { value: engineInfo.engineId }).then((res) => {
       console.log("心跳保活:", res);
-    }).catch(() => {})
+    }).catch(() => { })
   }, 30000);
 
   // 文件权限校验
@@ -355,6 +382,8 @@ const init = async () => {
   mqttClient.connect(connectOptions);
   // ========== ↑↑↑ 【Paho MQTT 适配结束】 ↑↑↑ ==========
 };
+
+init();
 </script>
 
 <style lang="scss" scoped>

@@ -20,7 +20,7 @@ import { HOME_PATH } from '@/router';
  * 返回首页逻辑 完全等效原 uni.$u.route({type:'switchTab',url:xxx})
  */
 const handleBack = () => {
-  uni.switchTab({
+  uni.reLaunch({
     url: HOME_PATH
   })
 };

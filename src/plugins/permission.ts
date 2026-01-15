@@ -21,12 +21,12 @@ routes.forEach((item) => {
  * @returns {boolean} 是否有权限
  */
 export function hasPerm(path = '') {
-  if (!isPathExists(path) && path !== '/') {
-    uni.redirectTo({
-      url: ERROR404_PATH,
-    });
-    return false;
-  }
+  // if (!isPathExists(path) && path !== '/') {
+  //   uni.redirectTo({
+  //     url: ERROR404_PATH,
+  //   });
+  //   return false;
+  // }
   // 在白名单中或有token，直接放行
   const hasPermission
     = whiteList.includes(removeQueryString(path)) || isLogin();

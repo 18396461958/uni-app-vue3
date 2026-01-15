@@ -8,7 +8,7 @@
     </view>
 
     <!-- 顶部头像+信息区域 原布局不变 -->
-    <view class="flex items-center pb-30rpx pl-30rpx pr-20rpx">
+    <view class="flex items-center pb-30rpx pl-30rpx pr-20rpx" style="margin-top: 35rpx;">
       <view class="mr-10rpx">
         <!-- 原生实现 u-avatar 头像组件 -->
         <view class="native-avatar">
@@ -16,11 +16,8 @@
         </view>
       </view>
       <view class="flex-1">
-        <view class="pb-20rpx text-36rpx">
-          uni-app
-        </view>
-        <view class="tips-color text-28rpx" @click="toCopy">
-          微信号:uni-app
+        <view class="pb-20rpx text-36rpx" >
+          Medusa引擎
         </view>
       </view>
       <view class="ml-10rpx p-10rpx">
