@@ -1,25 +1,34 @@
 <template>
   <view class="view-root">
     <view class="view-container">
-      <!-- 加载进度层 - 替换antd的环形进度为uni原生元素 -->
       <view class="d-progress" v-if="isLoad">
         <view class="progress-circle" :style="{ '--percent': loadProgress }"></view>
         <view class="loading-text">
           <text>{{ loadingInfo }}</text>
         </view>
       </view>
-
-      <!-- ✅ 核心：引擎播放器容器 唯一保留的核心节点 -->
       <view id="video-webrtc"></view>
     </view>
   </view>
 </template>
 
 <script lang="ts" setup>
-import { ref,onUnmounted,onMounted } from "vue";
+import { ref, onUnmounted, onMounted } from "vue";
 import { postAction } from "@/api";
 import { Medusa } from "@/static/engine.sdk";
-import mqtt from "mqtt";
+import { AppEvent, MeasureType } from "@/api/engine/AppEvent";
+
+// ✅ 关键：解决TS报错，声明全局Paho对象，无需安装任何依赖
+declare global {
+  interface Window {
+    Paho: any;
+  }
+}
+
+// ✅ 全局变量声明 - 保存MQTT客户端+定时器
+let mqttClient: any = null;
+let mqttHandshakeTimer: NodeJS.Timeout | null = null;
+let heartbeatTimer: NodeJS.Timeout | null = null;
 
 function randomString(length: number, chats: string) {
   if (!length) length = 1;
@@ -37,9 +46,6 @@ function randomUUID() {
   return randomString(32, chats);
 }
 
-import { AppEvent, MeasureType } from "@/api/engine/AppEvent";
-
-// 核心接口保留
 interface EngineInfo {
   whep: string;
   app: string;
@@ -52,7 +58,6 @@ interface EngineInfo {
   code: number;
 }
 
-// ✅ 只保留引擎核心必要变量，全部删除工具面板相关的toolState
 const isLoad = ref<boolean>(true);
 const loadProgress = ref<number>(0);
 const loadingInfo = ref<string>("连接中...");
@@ -63,7 +68,6 @@ const params = url.split("?")[1]?.replace(" ", "").split("&") || [];
 let models: string[] = [];
 let uuid = "";
 
-// 引擎配置信息 核心保留
 let engineInfo = {
   whep: "http://220.196.62.226:1985/rtc/v1/whep/",
   app: "app",
@@ -76,7 +80,6 @@ let engineInfo = {
   code: 0,
 };
 
-// ========== 以下全部为引擎核心回调方法，全部保留 ==========
 function OnEngineLoaded() {
   Medusa.InitEngine(
     "video-webrtc",
@@ -85,16 +88,29 @@ function OnEngineLoaded() {
   );
 }
 
-onUnmounted(()=>{
+// 页面卸载：销毁所有定时器+关闭MQTT连接+关闭流
+onUnmounted(() => {
   OnCloseStream()
+  if (mqttHandshakeTimer) {
+    clearInterval(mqttHandshakeTimer);
+    mqttHandshakeTimer = null; // 同时重置定时器
+  }
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer);
+    heartbeatTimer = null; // 同时重置定时器
+  }
+  if (mqttClient && mqttClient.isConnected()) {
+    mqttClient.disconnect();
+  }
+  // ✅ 必加：重置MQTT实例为null，彻底销毁旧实例引用
+  mqttClient = null;
 })
-onMounted(()=>{
+onMounted(() => {
   init();
 })
-// 关闭流核心方法 保留
+
 function OnCloseStream() {
   postAction("/Engine/CloseStream", { value: engineInfo.engineId }).then((res) => {
-    // uni-app路由跳转替换vue-router
     uni.redirectTo({ url: "/pages/model/Explorer" });
   });
 }
@@ -153,7 +169,6 @@ function NoModel(id: string) {
   postAction("/File/GetFileInfoByUuid", { value: id }).then((res: any) => {
     const fileInfo = res as any;
     if (fileInfo) {
-      // uni原生提示替换antd的message
       uni.showToast({ title: `${fileInfo.name}模型加载异常`, icon: "none", duration: 3000 });
     }
   }).catch((err) => {
@@ -182,7 +197,6 @@ function OnCameraPos() { }
 function OnCloseToElement() { }
 function OnClickPointMarker() { }
 
-// ========== 引擎加载核心方法 保留 ==========
 function LoadEngine() {
   AppEvent.dispatchEvent({ type: "OnLoadModelInfos", ModelIds: models });
   Medusa.RegisterEvent(Medusa.EnumEvents.OnEngineLoaded, OnEngineLoaded);
@@ -203,7 +217,6 @@ function LoadEngine() {
   Medusa.RegisterEvent(Medusa.EnumEvents.OnMessageCallback, (msg: string) => {
     AppEvent.dispatchEvent({ type: "OnMessageCallback", msg: msg });
   });
-  // 保留核心状态回调
   Medusa.RegisterStatusCallBack("ZoomMode", (value: string) => { });
   Medusa.RegisterStatusCallBack("CameraMode", (value: string) => { });
   Medusa.RegisterStatusCallBack("SetRoamPath", (value: string) => { });
@@ -211,11 +224,11 @@ function LoadEngine() {
     AppEvent.dispatchEvent({ type: "OnDrawRoamPath", recordView: value });
   });
   Medusa.RegisterStatusCallBack("GravityEnable", (value: string) => { });
-  Medusa.LoadEngine();
+  OnEngineLoaded();
 }
 
-// ========== 页面挂载核心逻辑 全部保留（引擎初始化关键） ==========
 const init = async () => {
+  Medusa.LoadEngine();
   // 解析url参数
   for (let i = 0; i < params.length; i++) {
     const param = params[i].split("=");
@@ -237,7 +250,6 @@ const init = async () => {
   const openRes = await postAction("/Engine/OpenStream", { value: uuid });
   engineInfo = openRes.Data as any;
   if (engineInfo.code < 0) {
-    // uni原生弹窗替换antd的Modal
     uni.showModal({
       title: "提示",
       content: "当前服务资源压力过大，无法加载模型，请稍后再试。",
@@ -248,14 +260,11 @@ const init = async () => {
   }
 
   loadProgress.value = 0;
-  // 心跳保活
-  setInterval(() => {
+  // 心跳保活定时器
+  heartbeatTimer = setInterval(() => {
     postAction("/Engine/KeepliveStream", { value: engineInfo.engineId }).then((res) => {
-      console.log("--------------------",res);
-    }).catch(()=>{
-      OnCloseStream();
-        init();
-    });
+      console.log("心跳保活:", res);
+    }).catch(() => {})
   }, 30000);
 
   // 文件权限校验
@@ -282,45 +291,73 @@ const init = async () => {
     return;
   }
 
-  // MQTT握手连接引擎 核心逻辑保留
+  // ========== ↓↓↓ 【终极修复：Paho MQTT 完整适配，核心区域】 ↓↓↓ ==========
   const handshakeId = randomUUID();
-  const options = {
-    clean: false,
-    connectTimeout: 4000,
-    clientId: `WebClient_${handshakeId}`,
-    username: "stream_engine",
-    password: "stream_engine",
-  };
+  const clientId = `WebClient_${handshakeId}`;
   const handshakeStr = `Handshake_WebClient_0_${handshakeId}`;
-  let client = mqtt.connect(engineInfo.mqttWs, options);
-  let timeHandle: NodeJS.Timeout;
-  client.on("connect", () => {
-    client.subscribe(engineInfo.engineId, (err) => {
-      if (!err) {
-        timeHandle = setInterval(() => {
-          client.publish(engineInfo.engineId, handshakeStr);
-        }, 300);
-      }
-    });
-  });
-  client.on("message", (subscribe: string, payload: Buffer) => {
-    const msg = payload.toString();
-    if (subscribe == engineInfo.engineId && msg.startsWith(`Handshake_MedusaEngine_${handshakeId}`)) {
-      LoadEngine();
-      client.unsubscribe(engineInfo.engineId);
-      client.disconnected = true;
-      clearTimeout(timeHandle);
-      client.endAsync();
+  // 解析mqttWs地址：Paho需要 地址+端口 分离
+  const mqttHost = engineInfo.mqttWs.replace("ws://", "").split(":")[0];
+  const mqttPort = Number(engineInfo.mqttWs.replace("ws://", "").split(":")[1].split("/")[0]);
+
+  // ✅ 1. 创建Paho MQTT客户端【唯一正确写法】
+  mqttClient = new window.Paho.Client(
+    mqttHost,    // MQTT地址
+    mqttPort,    // MQTT端口
+    clientId     // 客户端ID
+  );
+
+  // ✅ 2. 设置连接断开监听
+  mqttClient.onConnectionLost = (responseObject: any) => {
+    if (responseObject.errorCode !== 0) {
+      console.error("❌ MQTT连接断开:", responseObject.errorMessage);
+      uni.showToast({ title: "引擎握手连接断开", icon: "none", duration: 3000 });
     }
-  });
-  client.on("disconnect", (err) => {
-    console.log(err);
-  });
+  };
+
+  // ✅ 3. 设置收到消息监听【核心：引擎握手响应处理，业务逻辑不变】
+  mqttClient.onMessageArrived = (message: any) => {
+    const msg = message.payloadString;
+    const subscribeTopic = message.destinationName;
+    // 收到引擎握手响应，执行核心逻辑
+    if (subscribeTopic == engineInfo.engineId && msg.startsWith(`Handshake_MedusaEngine_${handshakeId}`)) {
+      LoadEngine(); // 加载引擎
+      if (mqttHandshakeTimer) clearInterval(mqttHandshakeTimer); // 停止发送握手包
+      mqttClient.unsubscribe(engineInfo.engineId); // 取消订阅
+      mqttClient.disconnect(); // 断开MQTT连接
+    }
+  };
+
+  // ✅ 4. 配置MQTT连接参数 + 建立连接【Paho核心：手动调用connect】
+  const connectOptions = {
+    userName: "stream_engine",  // 账号
+    password: "stream_engine",  // 密码
+    cleanSession: false,        // 对应原clean: false
+    timeout: 4,                 // 对应原connectTimeout:4000
+    onSuccess: () => {
+      console.log("✅ MQTT握手连接成功(Paho)");
+      // 连接成功后订阅引擎ID主题
+      mqttClient.subscribe(engineInfo.engineId);
+      // 定时发送握手包，和你原逻辑一致
+      mqttHandshakeTimer = setInterval(() => {
+        // 必须校验：客户端存在 + 处于已连接状态，才执行发送
+        if (mqttClient && mqttClient.isConnected()) {
+          mqttClient.send(engineInfo.engineId, handshakeStr);
+        }
+      }, 300);
+    },
+    onFailure: (err: any) => {
+      console.error("❌ MQTT连接失败:", err);
+      uni.showToast({ title: "引擎握手失败，请重试", icon: "none", duration: 3000 });
+    }
+  };
+
+  // ✅ 5. 执行MQTT连接
+  mqttClient.connect(connectOptions);
+  // ========== ↑↑↑ 【Paho MQTT 适配结束】 ↑↑↑ ==========
 };
 </script>
 
 <style lang="scss" scoped>
-// ✅ 全部为uni-app原生样式，删除所有无用样式
 .view-root {
   width: 100vw;
   height: 100vh;
@@ -337,7 +374,6 @@ const init = async () => {
   background-color: #143967;
 }
 
-// 引擎核心容器 - 必须保留 宽高100%
 #video-webrtc {
   width: 100%;
   height: 100%;
@@ -345,7 +381,6 @@ const init = async () => {
   z-index: 1;
 }
 
-// 加载进度层
 .d-progress {
   width: 100%;
   height: 100%;
@@ -360,7 +395,6 @@ const init = async () => {
   background-color: #143967;
 }
 
-// 原生环形进度条 替代antd的a-progress
 .progress-circle {
   width: 200rpx;
   height: 200rpx;
@@ -385,7 +419,6 @@ const init = async () => {
   color: #ffffff;
 }
 
-// 关闭按钮样式
 .action-bar {
   position: fixed;
   top: 30rpx;

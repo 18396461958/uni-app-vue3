@@ -2,7 +2,7 @@
   <view>
     <view class="login-form-wrap">
       <view class="title">
-        欢迎登录
+        欢迎使用Medusa引擎
       </view>
       <input v-model="tel" class="input-border" placeholder="请输入账号">
       <view class="input-wrap my-40rpx flex">
@@ -26,13 +26,13 @@
         </view>
       </view>
     </view>
-    <view class="hint">
+    <!-- <view class="hint">
       登录代表同意
       <text class="link">
         用户协议、隐私政策，
       </text>
       并授权使用您的账号信息（如昵称、头像、收获地址）以便您统一管理
-    </view>
+    </view> -->
   </view>
 </template>
 
@@ -40,7 +40,7 @@
 import type { CSSProperties } from 'vue';
 import { HOME_PATH, isTabBarPath, LOGIN_PATH, removeQueryString } from '@/router';
 import { setToken } from '@/utils/auth';
-import CryptoJS from "crypto-js";
+import SHA1 from "@/utils/sha1";
 import { UserApi } from '@/api';
 
 const tel = ref<string>('mqwang@digitwinstech.com');
@@ -121,7 +121,7 @@ async function submit() {
       account: tel.value, 
       accountType: "Email"
     }, 
-    password: CryptoJS.SHA1(code.value).toString()
+    password: SHA1(code.value).toString()
   }).catch(() => {
     uni.showToast({
       title: '登录失败',

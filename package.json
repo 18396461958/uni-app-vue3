@@ -10,7 +10,6 @@
     "uniapp-vue3-template",
     "Vite5",
     "TypeScript",
-    "uview-plus",
     "uniapp template",
     "UnoCSS"
   ],
@@ -59,8 +58,6 @@
     "clean:cache": "npx rimraf node_modules/.cache"
   },
   "dependencies": {
-    "mqtt": "^5.10.4",
-    "crypto-js": "^4.2.0",
     "@dcloudio/uni-app": "3.0.0-4080720251210001",
     "@dcloudio/uni-app-plus": "3.0.0-4080720251210001",
     "@dcloudio/uni-components": "3.0.0-4080720251210001",

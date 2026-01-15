@@ -1,7 +1,4 @@
 //@ts-check
-
-import CryptoJS from "crypto-js"; 
-
 /**
  * 深度克隆对象、数组
  * @param obj 被克隆的对象
@@ -102,12 +99,3 @@ export const getRequest = (paramsStr) => {
   });
   return paramsObj;
 };
-
-/**
- * 
- * @param {string} value 
- * @returns 
- */
-export function encodeCrypto(value) {
-  return CryptoJS.SHA1(value).toString();
-}

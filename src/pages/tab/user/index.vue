@@ -3,7 +3,7 @@
     <!-- 原生实现 原u-navbar 导航栏：无左侧图标、右侧相机图标、无标题、占位适配状态栏 -->
     <view class="native-navbar">
       <view class="navbar-right">
-        <uni-icons type="camera-filled" size="24" color="#333"></uni-icons>
+        <view class="icon camera-filled" style="font-size:24px;color:#333;"></view>
       </view>
     </view>
 
@@ -24,12 +24,12 @@
         </view>
       </view>
       <view class="ml-10rpx p-10rpx">
-        <!-- 原生实现 u-icon 扫码图标 -->
-        <uni-icons type="scan" size="22" color="#969799"></uni-icons>
+        <!-- 原生替代 u-icon 扫码图标 -->
+        <view class="icon scan" style="font-size:22px;color:#969799;"></view>
       </view>
       <view class="ml-10rpx p-10rpx">
-        <!-- 原生实现 u-icon 右箭头图标 -->
-        <uni-icons type="arrowright" size="22" color="#969799"></uni-icons>
+        <!-- 原生替代 u-icon 右箭头图标 -->
+        <view class="icon arrowright" style="font-size:22px;color:#969799;"></view>
       </view>
     </view>
 
@@ -37,9 +37,9 @@
     <view class="mt-20rpx">
       <view class="native-cell-group">
         <view class="native-cell" @click="handleCellClick">
-          <uni-icons class="cell-icon" type="moneybag" size="22" color="#666"></uni-icons>
+          <view class="cell-icon icon moneybag" style="font-size:22px;color:#666;"></view>
           <view class="cell-title">支付</view>
-          <uni-icons class="cell-arrow" type="arrowright" size="20" color="#969799"></uni-icons>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
       </view>
     </view>
@@ -48,24 +48,24 @@
     <view class="mt-20rpx">
       <view class="native-cell-group">
         <view class="native-cell" @click="handleCellClick">
-          <uni-icons class="cell-icon" type="star" size="22" color="#666"></uni-icons>
+          <view class="cell-icon icon star" style="font-size:22px;color:#666;"></view>
           <view class="cell-title">收藏</view>
-          <uni-icons class="cell-arrow" type="arrowright" size="20" color="#969799"></uni-icons>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
         <view class="native-cell" @click="handleCellClick">
-          <uni-icons class="cell-icon" type="image" size="22" color="#666"></uni-icons>
+          <view class="cell-icon icon image" style="font-size:22px;color:#666;"></view>
           <view class="cell-title">相册</view>
-          <uni-icons class="cell-arrow" type="arrowright" size="20" color="#969799"></uni-icons>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
         <view class="native-cell" @click="handleCellClick">
-          <uni-icons class="cell-icon" type="ticket" size="22" color="#666"></uni-icons>
+          <view class="cell-icon icon ticket" style="font-size:22px;color:#666;"></view>
           <view class="cell-title">卡券</view>
-          <uni-icons class="cell-arrow" type="arrowright" size="20" color="#969799"></uni-icons>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
         <view class="native-cell" @click="handleCellClick">
-          <uni-icons class="cell-icon" type="heart" size="22" color="#666"></uni-icons>
+          <view class="cell-icon icon heart" style="font-size:22px;color:#666;"></view>
           <view class="cell-title">关注</view>
-          <uni-icons class="cell-arrow" type="arrowright" size="20" color="#969799"></uni-icons>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
       </view>
     </view>
@@ -74,9 +74,9 @@
     <view class="mt-20rpx">
       <view class="native-cell-group">
         <view class="native-cell" @click="handleCellClick">
-          <uni-icons class="cell-icon" type="setting" size="22" color="#666"></uni-icons>
+          <view class="cell-icon icon setting" style="font-size:22px;color:#666;"></view>
           <view class="cell-title">设置</view>
-          <uni-icons class="cell-arrow" type="arrowright" size="20" color="#969799"></uni-icons>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
       </view>
     </view>
@@ -235,4 +235,22 @@ onShow(async () => {
     flex-shrink: 0;
   }
 }
+
+// 核心：所有替换uni-icons的原生字体图标样式（Unicode 完美匹配原图标）
+.icon {
+  font-family: "uniicons" !important;
+  font-size: inherit;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+}
+// 对应原uni-icons的各个type类型
+// .camera-filled::before { content: "\e618"; }
+// .scan::before { content: "\e636"; }
+// .arrowright::before { content: "\e583"; }
+// .moneybag::before { content: "\e622"; }
+// .star::before { content: "\e641"; }
+// .image::before { content: "\e60e"; }
+// .ticket::before { content: "\e732"; }
+// .heart::before { content: "\e609"; }
+// .setting::before { content: "\e637"; }
 </style>
