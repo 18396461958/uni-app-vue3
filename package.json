@@ -2,7 +2,6 @@
   "name": "uniapp-vue3-project",
   "type": "module",
   "version": "1.6.0",
-  "packageManager": "pnpm@9.15.0",
   "description": "uniapp(Vue3)",
   "keywords": [
     "Vue3",
@@ -18,7 +17,6 @@
     "pnpm": ">=8"
   },
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "uvm": "npx @dcloudio/uvm@latest",
     "uvm-rm": "node ./scripts/post-upgrade.js",
     "dev:h5": "uni",
@@ -58,24 +56,24 @@
     "clean:cache": "npx rimraf node_modules/.cache"
   },
   "dependencies": {
-    "@dcloudio/uni-app": "3.0.0-4080720251210001",
-    "@dcloudio/uni-app-plus": "3.0.0-4080720251210001",
-    "@dcloudio/uni-components": "3.0.0-4080720251210001",
-    "@dcloudio/uni-h5": "3.0.0-4080720251210001",
-    "@dcloudio/uni-mp-weixin": "3.0.0-4080720251210001",
-    "pinia": "2.2.4",
-    "pinia-plugin-persistedstate": "4.1.3",
-    "vue": "3.4.21",
-    "vue-i18n": "9.1.9"
+    "@dcloudio/uni-app": "3.0.0-alpha-5000020260104004",
+    "@dcloudio/uni-app-plus": "3.0.0-alpha-5000020260104004",
+    "@dcloudio/uni-components": "3.0.0-alpha-5000020260104004",
+    "@dcloudio/uni-h5": "3.0.0-alpha-5000020260104004",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-5000020260104004",
+    "pinia": "3.0.4",
+    "pinia-plugin-persistedstate": "4.7.1",
+    "vue": "3.5.26",
+    "vue-i18n": "11.2.8"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
     "@antfu/eslint-config": "5.0.0",
     "@dcloudio/types": "3.4.19",
-    "@dcloudio/uni-automator": "3.0.0-4080720251210001",
-    "@dcloudio/uni-cli-shared": "3.0.0-4080720251210001",
-    "@dcloudio/uni-stacktracey": "3.0.0-4080720251210001",
-    "@dcloudio/vite-plugin-uni": "3.0.0-4080720251210001",
+    "@dcloudio/uni-automator": "3.0.0-alpha-5000020260104004",
+    "@dcloudio/uni-cli-shared": "3.0.0-alpha-5000020260104004",
+    "@dcloudio/uni-stacktracey": "3.0.0-alpha-5000020260104004",
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-5000020260104004",
     "@esbuild/darwin-arm64": "0.25.1",
     "@esbuild/darwin-x64": "0.25.1",
     "@iconify-json/mdi": "^1.2.3",
