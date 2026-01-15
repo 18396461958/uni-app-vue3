@@ -77,7 +77,7 @@
       @file-upload-error="OnFileUploadError" />
 
     <!-- 顶部路径导航+操作按钮区【核心紧凑：高度64→48px，手机核心优化】 -->
-    <view class="flex justify-between h-[48px] w-full items-center border-b-[1px] border-b-solid border-[#DEDEDE]">
+    <view class="flex justify-between h-[48px] w-full items-center border-b-[1px] border-b-solid border-[#DEDEDE]" style="justify-content: space-between;">
       <view class="text-[12px] text-[#374099] path-root">
         <!-- 返回上级 -->
         <view @click="ReturnUp()" class="path-root"
