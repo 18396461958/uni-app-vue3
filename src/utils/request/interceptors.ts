@@ -3,7 +3,7 @@ import type {
   HttpRequestAbstract,
   HttpRequestConfig,
   HttpResponse,
-} from 'uview-plus/libs/luch-request/index';
+} from '../luch-request/index';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
 import storage from '@/utils/storage';

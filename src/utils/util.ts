@@ -1,6 +1,5 @@
 //@ts-check
 
-import dayjs from "dayjs";
 import CryptoJS from "crypto-js"; 
 
 /**
@@ -73,16 +72,6 @@ export function underLine2CamelCase(string) {
   return string.replace(/_([a-z])/g, (all, letter) => letter.toUpperCase());
 }
 
-/**
-  * 根据身份证获取 出生日期 年龄
-  * @param {String} card
-  */
-export function extractInfoFromIdCard(card) {
-  const birthday = `${card.substring(6, 10)}-${card.substring(10, 12)}-${card.substring(12, 14)}`;
-  const day = dayjs();
-  const age = Math.floor(dayjs(day).diff(dayjs(birthday), "day") / 365.25);
-  return { age: age, birthday: birthday };
-}
 
 /**
  * 从 url 参数上获取问号之后的参数组成的对象

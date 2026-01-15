@@ -2,7 +2,7 @@ import * as CommonApi from './common';
 import * as UserApi from './user';
 // 引入自己封装的请求方法 + 核心请求配置类型【和你封装的request.ts里的类型一致】
 import { get, post, download } from '@/utils/request';
-import type { HttpRequestConfig } from 'uview-plus/libs/luch-request/index';
+import type { HttpRequestConfig } from '@/utils/luch-request/index';
 export { engineApi } from "./engine/engine"
 export { CommonApi, UserApi };
 
