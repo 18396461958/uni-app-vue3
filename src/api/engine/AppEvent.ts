@@ -8,6 +8,7 @@ export interface BaseEvent<T extends string> {
 export interface ElementSelectedEventArgv {
     Position: string;
     ElementId: string;
+    ModelId: string;
 }
 
 export interface MeasureType {

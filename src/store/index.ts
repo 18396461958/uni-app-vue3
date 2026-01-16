@@ -25,3 +25,33 @@ function setupStore(app: App) {
 // 导出模块
 export { useAppStore, useUserStore };
 export default setupStore;
+
+export const useToolPlaneStore = defineStore('toolPlane', {
+  state: () => ({
+    projectId: "",
+    setting: false,
+    test: false,
+    structTree: true,
+    Property: true,
+    Roam: false,
+    Section: false,
+    Measure: false,
+    ElementOpt: false,
+    ViewPoint: false,
+    Marker: false,
+    AutoSelection: true,
+    roamingPosition: "",
+    SelectedElementId: "",
+    models: [""],
+    modelInfos: new Map<string, any>(),
+    selectedElements: [""],
+    SelectedTag: "",
+    SelectedElementGId: "",
+    markerColor: [255, 0, 0],
+    annotation: {
+      elementId: "",
+      position: "",
+    },
+    DivIndex: 1000,
+  }),
+})
