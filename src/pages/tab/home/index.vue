@@ -2,10 +2,10 @@
     <view class="page-container">
         <!-- 标题区域 - 简洁置顶 -->
         <view class="page-title">最近打开
-            <image src="/static/images/icon_nav_full@2x.png" alt="" style="height: 30px;width: 30px;border-radius: 40px; z-index: 9999;
+            <!-- <image src="/static/images/icon_nav_full@2x.png" alt="" style="height: 30px;width: 30px;border-radius: 40px; z-index: 9999;
             position: absolute;
             right: 20px;
-            cursor: pointer;background-color: rgb(0 122 255 / 75%);" @click="fullScreen" />
+            cursor: pointer;background-color: rgb(0 122 255 / 75%);" @click="fullScreen" /> -->
         </view>
 
         <!-- 文件列表主体 - 无外边框 极简容器 -->

@@ -72,7 +72,7 @@
   "preloadRule": {
     "pages/tab/home/index": {
       "network": "all",
-      "packages": ["pages/common"]
+      "packages": ["pages/common","pages/engine"]
     }
   },
   "tabBar": {

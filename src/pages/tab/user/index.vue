@@ -1,78 +1,112 @@
 <template>
   <view class="page-wrap">
-    <!-- 原生实现 原u-navbar 导航栏：无左侧图标、右侧相机图标、无标题、占位适配状态栏 -->
+    <!-- 原生实现 导航栏：无左侧图标、右侧相机图标(引擎日志截图)、无标题、占位适配状态栏 -->
     <view class="native-navbar">
       <view class="navbar-right">
         <view class="icon camera-filled" style="font-size:24px;color:#333;"></view>
       </view>
     </view>
 
-    <!-- 顶部头像+信息区域 原布局不变 -->
+    <!-- 顶部头像+引擎信息区域 原布局不变 内容改为引擎专属 -->
     <view class="flex items-center pb-30rpx pl-30rpx pr-20rpx" style="margin-top: 35rpx;">
       <view class="mr-10rpx">
-        <!-- 原生实现 u-avatar 头像组件 -->
+        <!-- 原生实现 头像组件 - 引擎LOGO -->
         <view class="native-avatar">
           <image src="/static/images/logo.png" mode="widthFix"></image>
         </view>
       </view>
       <view class="flex-1">
-        <view class="pb-20rpx text-36rpx" >
+        <view class="pb-6rpx text-36rpx font-bold">
           Medusa引擎
         </view>
+        <view class="text-24rpx tips-color">
+          v3.8.2 稳定运行中
+        </view>
       </view>
-      <view class="ml-10rpx p-10rpx">
-        <!-- 原生替代 u-icon 扫码图标 -->
-        <view class="icon scan" style="font-size:22px;color:#969799;"></view>
+      <view class="ml-10rpx p-10rpx" @click="handleEngineRefresh">
+        <!-- 原生替代 刷新图标 - 引擎刷新/重载 -->
+        <view class="icon reload" style="font-size:22px;color:#969799;"></view>
       </view>
-      <view class="ml-10rpx p-10rpx">
-        <!-- 原生替代 u-icon 右箭头图标 -->
+      <view class="ml-10rpx p-10rpx" @click="handleEngineMenu">
+        <!-- 原生替代 右箭头图标 - 引擎更多菜单 -->
         <view class="icon arrowright" style="font-size:22px;color:#969799;"></view>
       </view>
     </view>
 
-    <!-- 原生实现 原u-cell-group + u-cell 支付模块 -->
+    <!-- 原生实现 引擎核心操作模块 -->
     <view class="mt-20rpx">
       <view class="native-cell-group">
-        <view class="native-cell" @click="handleCellClick">
-          <view class="cell-icon icon moneybag" style="font-size:22px;color:#666;"></view>
-          <view class="cell-title">支付</view>
+        <view class="native-cell" @click="handleCellClick('engineStart')">
+          <view class="cell-icon icon play-circle" style="font-size:22px;color:#19be6b;"></view>
+          <view class="cell-title">启动引擎</view>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
+        </view>
+        <view class="native-cell" @click="handleCellClick('engineStop')">
+          <view class="cell-icon icon pause-circle" style="font-size:22px;color:#ed4014;"></view>
+          <view class="cell-title">停止引擎</view>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
+        </view>
+        <view class="native-cell" @click="handleCellClick('engineRestart')">
+          <view class="cell-icon icon refresh" style="font-size:22px;color:#0088ff;"></view>
+          <view class="cell-title">重启引擎</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
       </view>
     </view>
 
-    <!-- 原生实现 原u-cell-group + u-cell 收藏/相册等模块 -->
+    <!-- 原生实现 引擎配置与数据模块 -->
     <view class="mt-20rpx">
       <view class="native-cell-group">
-        <view class="native-cell" @click="handleCellClick">
-          <view class="cell-icon icon star" style="font-size:22px;color:#666;"></view>
-          <view class="cell-title">收藏</view>
+        <view class="native-cell" @click="handleCellClick('engineConfig')">
+          <view class="cell-icon icon gear" style="font-size:22px;color:#666;"></view>
+          <view class="cell-title">引擎配置</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
-        <view class="native-cell" @click="handleCellClick">
-          <view class="cell-icon icon image" style="font-size:22px;color:#666;"></view>
-          <view class="cell-title">相册</view>
+        <view class="native-cell" @click="handleCellClick('cacheClear')">
+          <view class="cell-icon icon trash" style="font-size:22px;color:#666;"></view>
+          <view class="cell-title">缓存清理</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
-        <view class="native-cell" @click="handleCellClick">
-          <view class="cell-icon icon ticket" style="font-size:22px;color:#666;"></view>
-          <view class="cell-title">卡券</view>
+        <view class="native-cell" @click="handleCellClick('engineLog')">
+          <view class="cell-icon icon file-text" style="font-size:22px;color:#666;"></view>
+          <view class="cell-title">运行日志</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
-        <view class="native-cell" @click="handleCellClick">
-          <view class="cell-icon icon heart" style="font-size:22px;color:#666;"></view>
-          <view class="cell-title">关注</view>
+        <view class="native-cell" @click="handleCellClick('dataBackup')">
+          <view class="cell-icon icon download" style="font-size:22px;color:#666;"></view>
+          <view class="cell-title">数据备份</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
       </view>
     </view>
 
-    <!-- 原生实现 原u-cell-group + u-cell 设置模块 -->
+    <!-- 原生实现 引擎插件与服务模块 -->
     <view class="mt-20rpx">
       <view class="native-cell-group">
-        <view class="native-cell" @click="handleCellClick">
+        <view class="native-cell" @click="handleCellClick('pluginManage')">
+          <view class="cell-icon icon layers" style="font-size:22px;color:#666;"></view>
+          <view class="cell-title">插件管理</view>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
+        </view>
+        <view class="native-cell" @click="handleCellClick('versionUpdate')">
+          <view class="cell-icon icon cloud-download" style="font-size:22px;color:#666;"></view>
+          <view class="cell-title">版本更新</view>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
+        </view>
+        <view class="native-cell" @click="handleCellClick('engineMonitor')">
+          <view class="cell-icon icon bar-chart" style="font-size:22px;color:#666;"></view>
+          <view class="cell-title">运行监控</view>
+          <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 原生实现 引擎系统设置模块 -->
+    <view class="mt-20rpx">
+      <view class="native-cell-group">
+        <view class="native-cell" @click="handleCellClick('systemSetting')">
           <view class="cell-icon icon setting" style="font-size:22px;color:#666;"></view>
-          <view class="cell-title">设置</view>
+          <view class="cell-title">系统设置</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
       </view>
@@ -81,27 +115,85 @@
 </template>
 
 <script setup lang="ts">
-import { useClipboard, usePermission } from '@/hooks';
+import { usePermission } from '@/hooks';
 
-const { setClipboardData, getClipboardData } = useClipboard();
-
-// 复制微信号 原逻辑不变
-const toCopy = async () => {
-  await setClipboardData({ data: '1234567890' });
-  const data = await getClipboardData();
-  console.log('[ data ] >', data);
+// 引擎刷新/重载事件
+const handleEngineRefresh = () => {
+  uni.showToast({ title: '引擎刷新中...', icon: 'loading', duration: 1500 });
+  console.log('执行引擎刷新、配置重载操作');
 };
 
-// 单元格点击事件（原is-link的跳转逻辑，可根据业务自行补充路由跳转）
-const handleCellClick = () => {
-  // 示例：uni.navigateTo({ url: '/pages/xxx/xxx' })
-  console.log('单元格被点击');
+// 引擎更多菜单事件
+const handleEngineMenu = () => {
+  console.log('打开引擎更多操作菜单');
 };
 
-// 登录鉴权 原逻辑不变
+// 引擎核心操作方法 - 可根据实际业务补充完整逻辑
+const engineStart = async () => {
+  uni.showLoading({ title: '启动引擎中' });
+  try {
+    // 真实业务：调用引擎启动接口/执行启动脚本
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    uni.hideLoading();
+    uni.showToast({ title: '引擎启动成功', icon: 'success' });
+  } catch (err) {
+    uni.hideLoading();
+    uni.showToast({ title: '引擎启动失败', icon: 'error' });
+  }
+};
+const engineStop = async () => {
+  uni.showLoading({ title: '停止引擎中' });
+  try {
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    uni.hideLoading();
+    uni.showToast({ title: '引擎已停止', icon: 'success' });
+  } catch (err) {
+    uni.hideLoading();
+    uni.showToast({ title: '引擎停止失败', icon: 'error' });
+  }
+};
+const engineRestart = async () => {
+  uni.showLoading({ title: '重启引擎中' });
+  try {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    uni.hideLoading();
+    uni.showToast({ title: '引擎重启成功', icon: 'success' });
+  } catch (err) {
+    uni.hideLoading();
+    uni.showToast({ title: '引擎重启失败', icon: 'error' });
+  }
+};
+
+// 单元格点击事件 - 引擎功能路由/操作分发（精准匹配各功能）
+const handleCellClick = (type: string) => {
+  console.log(`触发引擎操作：${type}`);
+  switch (type) {
+    case 'engineStart': engineStart(); break;
+    case 'engineStop': engineStop(); break;
+    case 'engineRestart': engineRestart(); break;
+    case 'engineConfig': uni.navigateTo({ url: '/pages/engine/config/config' }); break;
+    case 'cacheClear': uni.showToast({ title: '缓存清理完成', icon: 'success' }); break;
+    case 'engineLog': uni.navigateTo({ url: '/pages/engine/log/log' }); break;
+    case 'dataBackup': uni.navigateTo({ url: '/pages/engine/backup/backup' }); break;
+    case 'pluginManage': uni.navigateTo({ url: '/pages/engine/plugin/plugin' }); break;
+    case 'versionUpdate': uni.navigateTo({ url: '/pages/engine/update/update' }); break;
+    case 'engineMonitor': uni.navigateTo({ url: '/pages/engine/monitor/monitor' }); break;
+    case 'systemSetting': uni.navigateTo({ url: '/pages/engine/setting/setting' }); break;
+    default: uni.showToast({ title: '功能开发中', icon: 'none' }); break;
+  }
+};
+
+// 引擎鉴权+状态检测 页面展示时执行
 onShow(async () => {
   const hasPermission = await usePermission();
-  console.log(hasPermission ? '已登录' : '未登录，拦截跳转');
+  if (hasPermission) {
+    console.log('引擎管理权限通过，加载引擎状态');
+    // 真实业务：获取引擎当前运行状态、版本信息、配置信息等
+  } else {
+    console.log('无引擎管理权限，拦截操作');
+    uni.showToast({ title: '无管理权限', icon: 'error' });
+    uni.navigateBack();
+  }
 });
 </script>
 
@@ -144,14 +236,23 @@ onShow(async () => {
 .mt-20rpx {
   margin-top: 20rpx;
 }
+.pb-6rpx {
+  padding-bottom: 6rpx;
+}
 .text-36rpx {
   font-size: 36rpx;
   color: #333;
 }
-.text-28rpx {
-  font-size: 28rpx;
+.text-30rpx {
+  font-size: 30rpx;
 }
-// 还原原u-tips-color样式
+.text-24rpx {
+  font-size: 24rpx;
+}
+.font-bold {
+  font-weight: 600;
+}
+// 提示文本颜色
 .tips-color {
   color: #969799;
 }
@@ -233,21 +334,26 @@ onShow(async () => {
   }
 }
 
-// 核心：所有替换uni-icons的原生字体图标样式（Unicode 完美匹配原图标）
+// 核心：所有引擎相关的原生字体图标样式（Unicode 完美匹配uni-icons）
 .icon {
   font-family: "uniicons" !important;
   font-size: inherit;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
 }
-// 对应原uni-icons的各个type类型
+// 引擎页面用到的所有图标Unicode
 // .camera-filled::before { content: "\e618"; }
-// .scan::before { content: "\e636"; }
+// .reload::before { content: "\e86a"; }
 // .arrowright::before { content: "\e583"; }
-// .moneybag::before { content: "\e622"; }
-// .star::before { content: "\e641"; }
-// .image::before { content: "\e60e"; }
-// .ticket::before { content: "\e732"; }
-// .heart::before { content: "\e609"; }
+// .play-circle::before { content: "\e642"; }
+// .pause-circle::before { content: "\e643"; }
+// .refresh::before { content: "\e877"; }
+// .gear::before { content: "\e699"; }
+// .trash::before { content: "\e62d"; }
+// .file-text::before { content: "\e635"; }
+// .download::before { content: "\e60c"; }
+// .layers::before { content: "\e680"; }
+// .cloud-download::before { content: "\e610"; }
+// .bar-chart::before { content: "\e868"; }
 // .setting::before { content: "\e637"; }
 </style>

@@ -12,7 +12,7 @@
             "ignoreVersion": true
         },
         "nvueStyleCompiler": "uni-app",
-        "compilerVersion": 3,
+        "compilerVersion": 5,
         "splashscreen": {
             "alwaysShowBeforeRender": true,
             "waiting": true,
