@@ -295,7 +295,7 @@ function initData(modelId: string[]) {
 /* 保留原所有样式 + 新增原生弹窗/悬浮提示的样式，无任何第三方样式依赖 */
 .setting-root {
     color: #FFF;
-    width: 20%;
+    width: 40%;;
     height: calc(100vh - 10%);
     background-color: #324985;
     position: fixed;

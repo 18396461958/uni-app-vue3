@@ -298,7 +298,7 @@ function formatDate(dateStr: string) {
 <style scoped>
 .setting-root {
 	color: #FFF;
-	width: 20%;
+	width: 40%;;
 	height: calc(100vh - 10%);
 	background-color: #324985;
 	position: fixed;
