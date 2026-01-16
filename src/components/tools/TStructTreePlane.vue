@@ -27,63 +27,17 @@
           </view>
         </view>
       </view>
+      <Tree :tree-data="treeData" :expanded-keys="expandedKeys" :selected-keys="selectedKeys"
+        @toggle-expand="handleToggleExpand" @node-click="handleNodeClick" @load-more="LoadMore"
+        @model-action="handleModelAction" />
 
-      <!-- ✅ 核心：Vue3纯原生递归组件 渲染树形结构 -->
-      <view class="native-tree-container">
-        <!-- ✅ 核心：Vue3纯原生递归组件 渲染树形结构 (修改后版本) -->
-        <view class="native-tree-container">
-          <!-- 根节点循环，调用递归插槽 -->
-          <template v-for="node in treeData" :key="node.key">
-            <render-tree-item :node="node" />
-          </template>
 
-          <!-- ✅ 核心：递归组件 - 具名插槽实现，无编译问题，完美兼容Vue3 -->
-          <component is="template" #render-tree-item="{ node }">
-            <view class="tree-node-wrap">
-              <view class="tree-node-header" :class="{ selected: selectedKeys.includes(node.key) }"
-                @click.stop="handleNodeClick(node)">
-                <span class="tree-expand-btn" v-if="!node.isLeaf && !node.isLoadMore"
-                  @click.stop="handleToggleExpand(node)">
-                  {{ expandedKeys.includes(node.key) ? '−' : '+' }}
-                </span>
-                <span class="tree-expand-btn tree-empty-btn" v-else></span>
-
-                <img class="tree-icon" :src="icon1" alt="" v-if="!node.isLoadMore" />
-                <span class="tree-icon load-more-icon" v-else>⊞</span>
-
-                <div class="tree-node-title line-limit-length" :title="node.title">
-                  <template v-if="node.isLoadMore">
-                    <span class="load-more-node" @click.stop="LoadMore(node.key)">{{ node.title }}</span>
-                  </template>
-                  <template v-else>
-                    <span>{{ node.title }}</span>
-                    <div class="tree-action-box" v-if="node.isRoot">
-                      <span class="tree-action-tag" :title="node.isRemoved ? '添加模型' : '移除模型'"
-                        @click.stop="node.isRemoved ? AddModel(node.modelId) : OnRemove(node.modelId)">
-                        {{ node.isRemoved ? '➕' : '🗑️' }}
-                      </span>
-                    </div>
-                  </template>
-                </div>
-              </view>
-
-              <div class="tree-children-wrap" v-show="expandedKeys.includes(node.key)"
-                v-if="!node.isLeaf && !node.isLoadMore">
-                <div class="tree-children-line"></div>
-                <!-- ✅ 核心：递归调用自身，实现树形嵌套 -->
-                <template v-for="child in node.children" :key="child.key">
-                  <render-tree-item :node="child" />
-                </template>
-              </div>
-            </view>
-          </component>
-        </view>
-      </view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
+import Tree from "@/components/tools/Tree.vue";
 import { ref, watch, nextTick, onMounted } from "vue";
 import { DragHelper } from "@/utils/DragHelper";
 import { postAction } from "@/api";
@@ -92,6 +46,9 @@ import { Medusa } from "@/static/engine.sdk";
 import { useToolPlaneStore } from "@/store";
 import { AppEvent, ElementSelectedEventArgv } from "@/api/engine/AppEvent";
 
+function handleModelAction(){
+  
+}
 // 状态管理
 const toolState = useToolPlaneStore();
 // 根容器ref
@@ -503,13 +460,13 @@ const handleNodeClick = (node: any) => {
 /* 根容器样式 保留原样式 */
 .setting-root {
   color: #fff;
-  width: 340px;
-  height: calc(100vh - 148px);
+  width: 20vw;
+  height: calc(100vh - 10%);
   background-color: #324985;
   position: fixed;
   font-size: 14px;
-  top: 74px;
-  left: 10px;
+  top: 0px;
+  left: 0px;
   border: #3471cb solid 1px;
   box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
   z-index: 1000;

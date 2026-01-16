@@ -5,7 +5,7 @@
         <view class="tooltip-box" v-show="showTooltip">属性</view>
         <!-- uni-app原生图片标签替换img，纯原生 -->
         <image src="@/static/icons/icon_title_attribute@3x.png" class="btn-icon" 
-        @mouseenter="showTooltip = true" @mouseleave="showTooltip = false"></image>
+        @mouseenter="showTooltip = true" @mouseleave="showTooltip = false" ></image>
     </view>
 </template>
 
@@ -35,8 +35,8 @@ function handleClick() {
 }
 /* 按钮图标样式，保证图片正常展示 */
 .btn-icon {
-    width: 64rpx;
-    height: 64rpx;
+    width: 35px !important;
+    height: 35px !important;
 }
 /* 原生悬浮提示样式 - 精准对应原topLeft左上角位置 */
 .tooltip-box {

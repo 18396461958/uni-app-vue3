@@ -4,7 +4,7 @@
         <!-- 原生悬浮提示容器 - 纯view+text实现，替代uni-tooltip，位置完全对应原top-left -->
         <view class="tooltip-box">
             <!-- 原生img标签，保留原图标路径和属性 -->
-            <img src="@/static/icons/icon_title_file@3x.png" alt="标记">
+            <img src="@/static/icons/icon_title_file@3x.png" alt="标记" style="height: 35px;width: 35px;">
             <!-- 原生text标签承载中文提示文案，纯原生无任何封装 -->
             <text class="tooltip-text">模型标注</text>
         </view>

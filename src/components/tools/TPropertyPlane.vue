@@ -95,7 +95,7 @@ watch(() => ToolStore.Property, (newVal) => {
 function initProperty(modelId: string, elementId: string) {
     postAction("/ModelStruct/GetProperty", { modelId: modelId, componentId: elementId }).then((res: any) => {
         const ps: { [key: string]: Property[] } = {};
-        res.forEach((item: any) => {
+        res.Data.forEach((item: any) => {
             if (!ps[item.groupName]) {
                 ps[item.groupName] = [];
             }
@@ -125,12 +125,12 @@ function initProperty(modelId: string, elementId: string) {
 <style scoped>
 .setting-root {
     color: #FFF;
-    width: 340px;
-    height: calc(100vh - 148px);
+    width: 20vw;
+    height: calc(100vh - 10%);
     background-color: #324985;
     position: fixed;
-    top: 74px;
-    right: 10px;
+    top: 0px;
+    right: 0px;
     border: #3471cb solid 1px;
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;
@@ -212,9 +212,9 @@ function initProperty(modelId: string, elementId: string) {
 
 .setting-content {
     background-color: #324985;
-    height: calc(100vh - 148px - 40px);
-    margin-left: 10px;
-	margin-right: 10px;
+    height: calc(100vh - 10% - 40px);
+    margin-left: 0px;
+	margin-right: 0px;
 	overflow-y: auto;
 	overflow: auto;
 	scrollbar-width: thin;

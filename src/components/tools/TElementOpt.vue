@@ -4,7 +4,7 @@
     <!-- 包裹层：图片 + 纯原生手写的悬浮提示层 -->
     <view class="tooltip-wrap">
       <!-- 原生image组件 路径/模式不变 纯原生 -->
-      <image src="@/static/icons/icon_title_attribute@3x.png" mode="widthFix"></image>
+      <image src="@/static/icons/icon_title_attribute@3x.png" mode="widthFix" style="height: 35px;width: 35px;"></image>
       <!-- 纯原生实现的悬浮提示文本 替代uni-tooltip 位置top-left 中文固定文本 -->
       <view class="native-tooltip">元素操作</view>
     </view>

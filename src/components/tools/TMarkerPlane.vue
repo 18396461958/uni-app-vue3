@@ -299,7 +299,7 @@ function formatDate(dateStr: string) {
 .setting-root {
 	color: #FFF;
 	width: 340px;
-	height: calc(100vh - 148px);
+	height: calc(100vh - 10%);
 	background-color: #324985;
 	position: fixed;
 	top: 74px;
@@ -352,7 +352,7 @@ function formatDate(dateStr: string) {
 
 .setting-content {
 	background-color: #324985;
-	height: calc(100vh - 148px - 80px);
+	height: calc(100vh - 10% - 80px);
 	margin-left: 10px;
 	margin-right: 10px;
 	overflow-y: auto;
