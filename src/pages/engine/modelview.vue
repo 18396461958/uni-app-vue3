@@ -283,7 +283,7 @@ function NoElementFound() {
 function NoModel(id: string) {
   console.log("NoModel", id);
   postAction("/File/GetFileInfoByUuid", { value: id }).then((res: any) => {
-    const fileInfo = res as any;
+    const fileInfo = res.Data as any;
     if (fileInfo) {
       uni.showToast({ title: `${fileInfo.name}模型加载异常`, icon: "none", duration: 3000 });
     }

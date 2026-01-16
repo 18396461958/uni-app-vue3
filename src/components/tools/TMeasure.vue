@@ -4,7 +4,7 @@
     <!-- 纯原生实现悬浮提示：替代第三方a-tooltip，无任何组件依赖 -->
     <view class="tooltip-box">
       <!-- img 替换为 uni-app 原生图片标签 image -->
-      <image src="@/static/icons/icon_title_measure@3x.png" style="height: 40px;"></image>
+      <image src="@/static/icons/icon_title_measure@3x.png" style="height: 35px;width: 35px;"></image>
       <!-- 原生悬浮提示文字 - 直接写死中文 测量 -->
       <view class="tooltip-text">测量</view>
     </view>

@@ -2,7 +2,7 @@
     <!-- 原生根容器view替换div，纯原生无封装 -->
     <view class="took-button-root" @click="handleClick">
         <!-- 原生实现 左上角悬浮提示 纯view+css+原生鼠标事件，无任何组件 -->
-        <view class="tooltip-box" v-show="showTooltip">原型工具</view>
+        <view class="tooltip-box" v-show="showTooltip">属性</view>
         <!-- uni-app原生图片标签替换img，纯原生 -->
         <image src="@/static/icons/icon_title_attribute@3x.png" class="btn-icon" 
         @mouseenter="showTooltip = true" @mouseleave="showTooltip = false"></image>

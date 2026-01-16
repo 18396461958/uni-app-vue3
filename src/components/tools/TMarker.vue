@@ -1,28 +1,64 @@
 <template>
-    <!-- div 替换为 uni-app 原生view组件 -->
-    <view class="took-button-root" @click="toolState.Marker = !toolState.Marker">
-        <!-- 第三方a-tooltip 替换为 uni-app原生悬浮提示组件 uni-tooltip -->
-        <!-- 移除多语言$t，直接写死中文文案，原topLeft对应uni的top-left -->
-        <uni-tooltip placement="top-left" title="标记文件">
-            <!-- img标签保留，uni-app中img/uni-image都支持，此处保留原路径不变 -->
-            <img src="@/static/icons/icon_title_file@3x.png" alt="标记文件">
-        </uni-tooltip>
+    <!-- 纯原生view，无任何自定义组件，替换原外层容器 -->
+    <view class="tool-button-root" @click="toolState.Marker = !toolState.Marker">
+        <!-- 原生悬浮提示容器 - 纯view+text实现，替代uni-tooltip，位置完全对应原top-left -->
+        <view class="tooltip-box">
+            <!-- 原生img标签，保留原图标路径和属性 -->
+            <img src="@/static/icons/icon_title_file@3x.png" alt="标记">
+            <!-- 原生text标签承载中文提示文案，纯原生无任何封装 -->
+            <text class="tooltip-text">模型标注</text>
+        </view>
     </view>
 </template>
 
 <script lang="ts" setup>
-// 保留原有的仓库引入，业务逻辑不变
+// 保留原有业务逻辑，无任何修改
 import { useToolPlaneStore } from "@/store";
-// ✅ 彻底删除：多语言useI18n的引入+解构代码
-// import { useI18n } from "vue-i18n";
-// const { t: $t } = useI18n();
-
 const toolState = useToolPlaneStore();
 </script>
 
 <style lang="css" scoped>
-/* ✅ 优化：去掉无效的:deep()深度选择器（当前类就是本组件的，不需要穿透） */
-.took-button-root {
-    cursor: pointer; /* 鼠标悬停时显示手型 - H5端有效 */
+/* 按钮根容器样式 - 纯原生css */
+.tool-button-root {
+    cursor: pointer; /* H5端鼠标手型，小程序/App端无影响 */
+}
+/* 悬浮提示外层容器 - 核心：相对定位，保证提示文案绝对定位不偏移 */
+.tooltip-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* 原生悬浮提示文案样式 - 完美替代 uni-tooltip 的 top-left 左上悬浮效果 */
+.tooltip-text {
+    /* 绝对定位实现左上悬浮，和原uni-tooltip的top-left完全一致 */
+    position: absolute;
+    top: -36rpx;
+    left: -20rpx;
+    /* 提示框样式美化，和原生tooltip一致的视觉效果 */
+    padding: 8rpx 16rpx;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    font-size: 24rpx;
+    border-radius: 6rpx;
+    white-space: nowrap;
+    /* 默认隐藏，悬浮显示 */
+    opacity: 0;
+    visibility: hidden;
+    /* 过渡动画，显示隐藏更顺滑 */
+    transition: all 0.2s ease-in-out;
+    /* 提高层级防止被遮挡 */
+    z-index: 999;
+    /* 纯原生样式，无任何deep穿透 */
+}
+/* 鼠标悬浮时显示提示文案 - 原生css hover事件，替代uni-tooltip的触发逻辑 */
+.tooltip-box:hover .tooltip-text {
+    opacity: 1;
+    visibility: visible;
+}
+/* 图标本身样式，可选优化，保持原大小 */
+.tooltip-box img {
+    width: auto;
+    height: 48rpx;
 }
 </style>

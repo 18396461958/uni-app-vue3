@@ -1,16 +1,33 @@
 <template>
 	<view class="setting-root" ref="settingRoot">
-		<!-- 确认提示弹窗-uni原生替换a-modal -->
-		<uni-modal v-model="confirmAdd" title="标注" @confirm="open = true; confirmAdd = false">
-			<view>当前位置已存在标注，是否继续添加？</view>
-		</uni-modal>
+		<!-- ✅ 纯原生实现【重复标注确认弹窗】 替代 uni-modal 无任何封装组件 -->
+		<view v-if="confirmAdd" class="modal-mask" @tap="confirmAdd = false">
+			<view class="modal-box" @tap.stop>
+				<view class="modal-title">标注</view>
+				<view class="modal-content">当前位置已存在标注，是否继续添加？</view>
+				<view class="modal-btn-group">
+					<view class="modal-btn cancel-btn" @tap="confirmAdd = false">取消</view>
+					<view class="modal-btn confirm-btn" @tap="open = true; confirmAdd = false">确认</view>
+				</view>
+			</view>
+		</view>
 
-		<!-- 新增/编辑弹窗-uni原生替换a-modal -->
-		<uni-modal v-model="open" title="标注" @confirm="AddMarker" @cancel="open = false">
-			<uni-textarea v-model="inputName" auto-height :min-height="180"></uni-textarea>
-		</uni-modal>
+		<!-- ✅ 纯原生实现【新增/编辑标注弹窗】 替代 uni-modal 无任何封装组件 -->
+		<view v-if="open" class="modal-mask" @tap="open = false">
+			<view class="modal-box modal-box-lg" @tap.stop>
+				<view class="modal-title">标注</view>
+				<view class="modal-content">
+					<!-- ✅ 纯原生textarea 替代 uni-textarea 原生基础标签 无封装 -->
+					<textarea v-model="inputName" class="native-textarea" auto-height :min-height="180"></textarea>
+				</view>
+				<view class="modal-btn-group">
+					<view class="modal-btn cancel-btn" @tap="open = false">取消</view>
+					<view class="modal-btn confirm-btn" @tap="AddMarker">确认</view>
+				</view>
+			</view>
+		</view>
 
-		<!-- 头部组件 鼠标按下事件改为触摸事件 适配uni多端 -->
+		<!-- 头部组件 触摸事件保留 适配多端 -->
 		<TPlaneHeader @touchstart="dragHelper.startDrag" @close="() => { ToolStore.Marker = false }" title="标注" />
 		
 		<view class="setting-content">
@@ -20,7 +37,7 @@
 				<text style="margin-left: 10px;">添加标注</text>
 			</view>
 			
-			<!-- 标注列表循环 -->
+			<!-- 标注列表循环 原有逻辑完全不变 -->
 			<view :id="item.elementId" :class="item.isShow? 'setting-item-selected': 'setting-item'" v-for="(item, index) in markerList" :key="index">
 				<image class="item-img" :src="item.image" mode="widthFix" @click="ZoomView(item)"></image>
 				<view class="item-text-title">
@@ -28,20 +45,21 @@
 						<text>{{ item.name }}</text>
 					</view>
 					<view style="margin-top: 10px; margin-left: 10px;">
-						<uni-switch v-model="item.isShow" @change="(e) => ShowChange(e.value,item)" />
+						<!-- ✅ 纯原生实现开关 替代 uni-switch 无任何封装 手写实现 -->
+						<view class="native-switch" :class="item.isShow ? 'active' : ''" @tap="ShowChange(!item.isShow, item)">
+							<view class="switch-slider"></view>
+						</view>
+					</view>
 				</view>
 				<view class="item-bottom">
 					<text>{{ formatDate(item.createdTimDate) }}</text>
 					<view style="width: 40px; display: flex; flex-direction: row; justify-content: space-between;">
-						<!-- 编辑按钮 替代原a-tooltip+图标 -->
 						<text class="icon-select" @click="EditMarker(item)" title="编辑">✏️</text>
-						<!-- 删除按钮 替代原a-popconfirm+图标 原生确认弹窗实现 -->
 						<text class="icon-select del-icon" @click="handleDelConfirm(item)" title="删除">🗑️</text>
 					</view>
 				</view>
 			</view>
 		</view>
-	</view>
 	</view>
 </template>
 
@@ -54,10 +72,10 @@ import { useToolPlaneStore } from "@/store";
 import { Medusa } from '@/static/engine.sdk';
 import { AppEvent } from '@/api/engine/AppEvent';
 
-// 移除所有i18n相关代码
+// 纯中文 无任何i18n相关代码
 const inputName = ref<string>("");
 
-// 标注数据结构 不变
+// 标注数据结构 完全不变
 interface IMarker {
 	id: number,
 	projectId: string,
@@ -83,14 +101,14 @@ const markStyle = ref({
 });
 const color_rbg = ref([255,255,0]);
 
-// 监听标注面板显隐 不变
+// 监听标注面板显隐 逻辑不变
 watch(() => ToolStore.Marker, (newVal, oldVal) => {
 	if (newVal) {
 		settingRoot.value!.style.zIndex=ToolStore.DivIndex+++"";
 	}
 })
 
-// 构件选中事件 不变
+// 构件选中事件 逻辑不变
 AppEvent.addEventListener("OnElementSelected", (e) => {
 	if (ToolStore.Marker) {
 		markerList.value.forEach((marker) => {
@@ -106,7 +124,7 @@ AppEvent.addEventListener("OnElementSelected", (e) => {
 	}
 });
 
-// 新增前置校验
+// 新增前置校验 逻辑不变
 function AddMarkerPre() {
 	editMarker = null;
 	if (ToolStore.annotation.elementId) {
@@ -117,14 +135,13 @@ function AddMarkerPre() {
 			open.value = true;
 		}
 	} else {
-		// 替换原ant message 为uni原生提示
 		uni.showToast({ title: '请点击选择批注的构件', icon: 'none', duration: 2000 });
 	}
 }
 
 let editMarker:IMarker|null = null;
 
-// 编辑标注
+// 编辑标注 逻辑不变
 function EditMarker(item:IMarker) {
 	editMarker = item;
 	open.value = true;
@@ -181,7 +198,7 @@ function AddMarker() {
 	open.value = false;
 }
 
-// 显示/隐藏标注切换 不变
+// 显示/隐藏标注切换 逻辑不变
 function ShowChange(checked:boolean, item:IMarker) {
 	item.isShow = checked;
 	if(checked) {
@@ -198,7 +215,7 @@ function ShowChange(checked:boolean, item:IMarker) {
 	}
 }
 
-// 点击图片跳转视角 不变
+// 点击图片跳转视角 逻辑不变
 function ZoomView(item:IMarker) {
 	const style = JSON.parse(item.style);
 	if(!item.isShow) {
@@ -215,7 +232,7 @@ function ZoomView(item:IMarker) {
 	Medusa.SetCameraView(item.view);
 }
 
-// 删除确认弹窗 替代原a-popconfirm
+// 删除确认弹窗 逻辑不变
 function handleDelConfirm(item:IMarker) {
 	uni.showModal({
 		title: '确认删除',
@@ -228,17 +245,16 @@ function handleDelConfirm(item:IMarker) {
 	})
 }
 
-// 删除标注逻辑
+// 删除标注逻辑 不变
 function deleteView(item:IMarker) {
 	postAction("/maker/DeleteMarker", { value: item.id }).then((res: any) => {
-		// 替换原ant message 为uni原生提示
 		uni.showToast({ title: '删除成功', icon: 'success', duration: 1500 });
 		markerList.value = markerList.value.filter((view) => view.id != item.id);
 		Medusa.RemoveMarker(item.id);
 	});
 }
 
-// 标注列表数据源
+// 标注列表数据源 不变
 const markerList = ref<IMarker[]>([]);
 
 // 监听面板显隐加载/清空数据 不变
@@ -265,7 +281,7 @@ function initData(modelId: string[]) {
 const settingRoot = ref<HTMLElement | null>(null);
 const dragHelper = new DragHelper(settingRoot);
 
-// 替代moment的【原生日期格式化函数】 无第三方依赖
+// 原生日期格式化函数 无第三方依赖 不变
 function formatDate(dateStr: string) {
 	if(!dateStr) return '';
 	const date = new Date(dateStr);
@@ -398,15 +414,101 @@ function formatDate(dateStr: string) {
 .icon-btn{
 	font-size: 18px;
 }
-/* 适配uni-textarea的默认样式 */
-:deep(.uni-textarea) {
+
+/* ✅ 新增：纯原生弹窗遮罩样式 */
+.modal-mask {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0,0,0,0.6);
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+/* ✅ 新增：原生弹窗主体样式 */
+.modal-box {
+	width: 280px;
+	background-color: #fff;
+	border-radius: 8px;
+	overflow: hidden;
+	color: #333;
+}
+/* ✅ 新增：大尺寸弹窗适配编辑页 */
+.modal-box-lg {
+	width: 320px;
+}
+/* ✅ 新增：弹窗标题样式 */
+.modal-title {
+	font-size: 16px;
+	font-weight: bold;
+	padding: 15px;
+	border-bottom: 1px solid #e5e5e5;
+	text-align: center;
+}
+/* ✅ 新增：弹窗内容样式 */
+.modal-content {
+	padding: 20px 15px;
+	font-size: 14px;
+	line-height: 1.5;
+}
+/* ✅ 新增：弹窗按钮组样式 */
+.modal-btn-group {
+	display: flex;
+	border-top: 1px solid #e5e5e5;
+}
+.modal-btn {
+	flex: 1;
+	text-align: center;
+	padding: 12px 0;
+	font-size: 14px;
+}
+.cancel-btn {
+	border-right: 1px solid #e5e5e5;
+	color: #666;
+}
+.confirm-btn {
+	color: #007aff;
+}
+
+/* ✅ 新增：纯原生textarea样式 替代 uni-textarea */
+.native-textarea {
+	width: 100%;
+	min-height: 180px;
 	background-color: #fff;
 	color: #333;
-	padding: 5px;
+	padding: 8px;
 	border-radius: 4px;
+	font-size: 14px;
+	line-height: 1.5;
+	box-sizing: border-box;
 }
-/* 适配uni-switch的样式 */
-:deep(.uni-switch) {
-	transform: scale(0.8);
+
+/* ✅ 新增：纯原生开关样式 替代 uni-switch 完全手写无封装 */
+.native-switch {
+	width: 40px;
+	height: 22px;
+	border-radius: 11px;
+	background-color: #ccc;
+	position: relative;
+	transition: background-color 0.3s ease;
+}
+.native-switch.active {
+	background-color: #007aff;
+}
+.switch-slider {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background-color: #fff;
+	position: absolute;
+	top: 1px;
+	left: 1px;
+	transition: left 0.3s ease;
+}
+.native-switch.active .switch-slider {
+	left: 19px;
 }
 </style>

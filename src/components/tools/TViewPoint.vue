@@ -10,16 +10,11 @@
   </view>
 </template>
 
-<script>
+<script setup lang="ts">
 // 原生js写法，移除ts setup语法糖，保留仓库引入逻辑
 import { useToolPlaneStore } from "@/store";
 const toolState = useToolPlaneStore();
 
-export default {
-  data() {
-    return {}
-  }
-}
 </script>
 
 <style scoped>

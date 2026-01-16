@@ -1,209 +1,165 @@
 <template>
-  <div class="setting-root" ref="settingRoot">
-    <!-- 头部标题栏 - 纯原生实现 替代TPlaneHeader -->
-    <div class="plane-header" @mousedown="dragHelper.startDrag">
-      <div class="header-title">结构树</div>
-      <div class="header-close" @click="toolState.structTree = false">×</div>
-    </div>
-    
+  <view class="setting-root" ref="settingRoot">
+    <!-- 头部标题栏 - 纯原生实现 -->
+    <view class="plane-header" @mousedown="dragHelper.startDrag" @touchstart="dragHelper.startDrag">
+      <view class="header-title">结构树</view>
+      <view class="header-close" @click="handleClose">×</view>
+    </view>
+
     <!-- 主体内容区 -->
-    <div class="setting-content">
-      <!-- 纯原生搜索框+下拉联想 替代 a-auto-complete + a-input-search -->
-      <div class="search-wrapper">
-        <div class="search-input-box">
-          <input
-            type="text"
-            v-model="searchKey"
-            class="native-search-input"
-            placeholder="搜索模型/构件"
-            @input="handleSearchInput"
-            @keyup.enter="onSearch(searchKey)"
-          />
-          <button class="search-btn" @click="onSearch(searchKey)" :class="{loading:searchLoading}">
-            <span v-if="!searchLoading">搜索</span>
-            <span class="loading-icon" v-else></span>
+    <view class="setting-content">
+      <!-- 纯原生搜索框+下拉联想 -->
+      <view class="search-wrapper">
+        <view class="search-input-box">
+          <input type="text" class="native-search-input" placeholder="搜索模型/构件" v-model="searchKey"
+            @input="handleSearchInput" @keyup.enter="onSearch(searchKey)" />
+          <button class="search-btn" :class="{ loading: searchLoading }" @click="onSearch(searchKey)">
+            <view v-if="!searchLoading">搜索</view>
+            <view class="loading-icon" v-else></view>
           </button>
-        </div>
+        </view>
         <!-- 原生下拉搜索候选列表 -->
-        <div class="search-dropdown" v-show="searchOptions.length>0 && searchKey">
-          <div 
-            class="search-option" 
-            v-for="(item,idx) in searchOptions" 
-            :key="idx"
-            @click="onSearchResultSelect(item.value, item)"
-          >
-            <div class="option-name">{{ item.value }}</div>
-            <div class="option-path">{{ item.originData.path }}</div>
-          </div>
-        </div>
-      </div>
+        <view class="search-dropdown" v-show="searchOptions.length > 0 && searchKey">
+          <view class="search-option" v-for="(item, idx) in searchOptions" :key="idx"
+            @click="onSearchResultSelect(item.value, item)">
+            <view class="option-name">{{ item.value }}</view>
+            <view class="option-path">{{ item.originData.path }}</view>
+          </view>
+        </view>
+      </view>
 
-      <!-- ✅ 核心：纯原生递归渲染树形结构 替代 antd-vue a-tree 完整实现所有功能 -->
-      <div class="native-tree-container">
-        <div class="tree-node" v-for="node in treeData" :key="node.key">
-          <tree-node 
-            :node="node" 
-            :expanded-keys="expandedKeys"
-            :selected-keys="selectedKeys"
-            @node-expand="handleNodeExpand"
-            @node-select="handleNodeSelect"
-            @load-more="LoadMore"
-            @add-model="AddModel"
-            @remove-model="OnRemove"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 树形节点递归组件 纯原生实现 核心组件 -->
-  <template id="treeNode">
-    <div class="tree-node-wrap">
-      <!-- 节点头部 - 展开/收起/图标/标题/操作按钮 -->
-      <div 
-        class="tree-node-header" 
-        :class="{selected: selectedKeys.includes(node.key)}"
-        @click.stop="handleNodeClick"
-      >
-        <!-- 展开/收起按钮 -->
-        <span class="tree-expand-btn" v-if="!node.isLeaf && !node.isLoadMore" @click.stop="toggleExpand">
-          {{ expandedKeys.includes(node.key) ? '−' : '+' }}
-        </span>
-        <span class="tree-expand-btn tree-empty-btn" v-else></span>
-        
-        <!-- 节点图标 -->
-        <img class="tree-icon" :src="icon1" alt="" v-if="!node.isLoadMore" />
-        <span class="tree-icon load-more-icon" v-else>⊞</span>
-        
-        <!-- 节点标题 -->
-        <div class="tree-node-title line-limit-length" :title="node.title">
-          <template v-if="node.isLoadMore">
-            <span class="load-more-node" @click.stop="$emit('load-more', node.key)">{{ node.title }}</span>
+      <!-- ✅ 核心：Vue3纯原生递归组件 渲染树形结构 -->
+      <view class="native-tree-container">
+        <!-- ✅ 核心：Vue3纯原生递归组件 渲染树形结构 (修改后版本) -->
+        <view class="native-tree-container">
+          <!-- 根节点循环，调用递归插槽 -->
+          <template v-for="node in treeData" :key="node.key">
+            <render-tree-item :node="node" />
           </template>
-          <template v-else>
-            <span>{{ node.title }}</span>
-            <!-- 根节点操作按钮 纯原生替代 a-tag + a-tooltip -->
-            <div class="tree-action-box" v-if="node.isRoot">
-              <span 
-                class="tree-action-tag" 
-                :title="node.isRemoved ? '添加模型' : '移除模型'"
-                @click.stop="node.isRemoved ? $emit('add-model', node.modelId) : $emit('remove-model', node.modelId)"
-              >
-                {{ node.isRemoved ? '➕' : '🗑️' }}
-              </span>
-            </div>
-          </template>
-        </div>
-      </div>
 
-      <!-- 子节点区域 - 懒加载+递归渲染 带连接线 -->
-      <div 
-        class="tree-children-wrap" 
-        v-show="expandedKeys.includes(node.key)"
-        v-if="!node.isLeaf && !node.isLoadMore"
-      >
-        <div class="tree-children-line"></div>
-        <div class="tree-node" v-for="child in node.children" :key="child.key">
-          <tree-node 
-            :node="child" 
-            :expanded-keys="expandedKeys"
-            :selected-keys="selectedKeys"
-            @node-expand="$emit('node-expand', ...arguments)"
-            @node-select="$emit('node-select', ...arguments)"
-            @load-more="$emit('load-more', ...arguments)"
-            @add-model="$emit('add-model', ...arguments)"
-            @remove-model="$emit('remove-model', ...arguments)"
-          />
-        </div>
-      </div>
-    </div>
-  </template>
+          <!-- ✅ 核心：递归组件 - 具名插槽实现，无编译问题，完美兼容Vue3 -->
+          <component is="template" #render-tree-item="{ node }">
+            <view class="tree-node-wrap">
+              <view class="tree-node-header" :class="{ selected: selectedKeys.includes(node.key) }"
+                @click.stop="handleNodeClick(node)">
+                <span class="tree-expand-btn" v-if="!node.isLeaf && !node.isLoadMore"
+                  @click.stop="handleToggleExpand(node)">
+                  {{ expandedKeys.includes(node.key) ? '−' : '+' }}
+                </span>
+                <span class="tree-expand-btn tree-empty-btn" v-else></span>
+
+                <img class="tree-icon" :src="icon1" alt="" v-if="!node.isLoadMore" />
+                <span class="tree-icon load-more-icon" v-else>⊞</span>
+
+                <div class="tree-node-title line-limit-length" :title="node.title">
+                  <template v-if="node.isLoadMore">
+                    <span class="load-more-node" @click.stop="LoadMore(node.key)">{{ node.title }}</span>
+                  </template>
+                  <template v-else>
+                    <span>{{ node.title }}</span>
+                    <div class="tree-action-box" v-if="node.isRoot">
+                      <span class="tree-action-tag" :title="node.isRemoved ? '添加模型' : '移除模型'"
+                        @click.stop="node.isRemoved ? AddModel(node.modelId) : OnRemove(node.modelId)">
+                        {{ node.isRemoved ? '➕' : '🗑️' }}
+                      </span>
+                    </div>
+                  </template>
+                </div>
+              </view>
+
+              <div class="tree-children-wrap" v-show="expandedKeys.includes(node.key)"
+                v-if="!node.isLeaf && !node.isLoadMore">
+                <div class="tree-children-line"></div>
+                <!-- ✅ 核心：递归调用自身，实现树形嵌套 -->
+                <template v-for="child in node.children" :key="child.key">
+                  <render-tree-item :node="child" />
+                </template>
+              </div>
+            </view>
+          </component>
+        </view>
+      </view>
+    </view>
+  </view>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from "vue";
+import { ref, watch, nextTick, onMounted } from "vue";
 import { DragHelper } from "@/utils/DragHelper";
-import { onMounted } from "vue";
 import { postAction } from "@/api";
 import icon1 from "@/static/icons/icon_list_structure@3x.png";
 import { Medusa } from "@/static/engine.sdk";
 import { useToolPlaneStore } from "@/store";
 import { AppEvent, ElementSelectedEventArgv } from "@/api/engine/AppEvent";
 
-// 全局状态 & 基础变量
+// 状态管理
 const toolState = useToolPlaneStore();
-const settingRoot = ref(null);
+// 根容器ref
+const settingRoot = ref<HTMLElement | null>(null);
+// 拖拽实例
 const dragHelper = new DragHelper(settingRoot);
-const expandedKeys = ref([]);
-const selectedKeys = ref([]);
-const treeData = ref([]);
-const isSearching = ref(false);
-const modelInfo = ref([]);
 
-// 搜索相关变量
-const searchKey = ref("");
-const searchOptions = ref([]);
-const searchLoading = ref(false);
+// ✅ 所有响应式变量 替代vue2的data
+const expandedKeys = ref<string[]>([]);
+const selectedKeys = ref<string[]>([]);
+const treeData = ref<any[]>([]);
+const isSearching = ref<boolean>(false);
+const modelInfo = ref<any[]>([]);
+const searchKey = ref<string>("");
+const searchOptions = ref<any[]>([]);
+const searchLoading = ref<boolean>(false);
 
-// 右键菜单文本（已移除多语言 改为中文）
-const optAction = ref([
-  "重置", "显示全部", "半透明", "隔离", "高亮", "隐藏", "显示", 
+// 右键菜单文本（纯中文）
+const optAction = ref<string[]>([
+  "重置", "显示全部", "半透明", "隔离", "高亮", "隐藏", "显示",
   "定位", "添加标记", "移除标记", "属性面板"
 ]);
 
-// 节点默认样式
+// 常量配置
+const PAGE_SIZE = 100;
 const treeItemStyle = {
   color: "#FFF",
   fontSize: "16px",
   backgroundColor: "#324985",
   paddingLeft: "10px",
   paddingRight: "10px",
-  "min-height": "25px",
+  minHeight: "25px",
   width: "100%",
   display: "flex",
   flexDirection: "row",
-  alignContent: "center",
   alignItems: "center",
   justifyContent: "flex-start",
 };
 
-/** 防抖函数 - 保留原逻辑 */
-function myDebounce(fn, delay) {
-  let timer = null;
-  return function (...args) {
+/** ✅ 防抖函数 - TS重构 无this指向问题 */
+const myDebounce = (fn: Function, delay: number) => {
+  let timer: NodeJS.Timeout | null = null;
+  return function (...args: any[]) {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => {
       fn.apply(this, args);
       timer = null;
     }, delay);
   };
-}
+};
 
 /** 展开第一个节点递归方法 */
-function expendFirstNode(array, result = []) {
+const expendFirstNode = (array: any[], result: string[] = []) => {
   if (array && array.length > 0) {
     result.push(array[0].key);
-    expendFirstNode(array[0].children);
+    expendFirstNode(array[0].children, result);
   }
-}
+};
 
 /** 搜索输入防抖处理 */
-const handleSearchInput = myDebounce((e) => {
-  const val = e.target.value.trim();
+const handleSearchInput = myDebounce((e: Event) => {
+  const val = (e.target as HTMLInputElement).value.trim();
   searchKey.value = val;
-  if(val) onSearch(val);
-  else searchOptions.value = [];
+  val ? onSearch(val) : searchOptions.value = [];
 }, 500);
 
-/** 监听面板显示 层级置顶 */
-watch(() => toolState.structTree, (newVal) => {
-  if (newVal && settingRoot.value) {
-    settingRoot.value.style.zIndex = toolState.DivIndex++ + "";
-  }
-})
-
-/** 递归查找节点 */
-function findNodeByKey(key, nodes) {
+/** 递归查找节点 - 核心方法 */
+const findNodeByKey = (key: string, nodes: any[]): any => {
   if (!nodes) return null;
   for (const node of nodes) {
     if (node.key === key) return node;
@@ -213,17 +169,16 @@ function findNodeByKey(key, nodes) {
     }
   }
   return null;
-}
+};
 
-/** 分页常量 & 树懒加载核心方法 - 保留原逻辑 */
-const PAGE_SIZE = 100;
-const onLoadData = treeNode => {
-  return new Promise(resolve => {
+/** 树懒加载核心方法 */
+const onLoadData = (treeNode: any) => {
+  return new Promise<void>((resolve) => {
     if (treeNode && treeNode.isLoadMore) { resolve(); return; }
     if (treeNode?.children && treeNode.children.length > 0) { resolve(); return; }
 
     postAction("/ModelStruct/GetTreeByParent", { modelId: treeNode.modelId, parentId: treeNode.id }).then((res) => {
-      const data = res || [];
+      const data = res.Data || [];
       if (data && treeNode) {
         const array = data.map((item) => ({
           title: item?.name?.replace("_$AssimpFbx$_", " ") ?? "",
@@ -252,24 +207,24 @@ const onLoadData = treeNode => {
         }
       }
       resolve();
-    }).catch(()=>resolve());
+    }).catch(() => resolve());
   });
 };
 
-/** 加载更多核心方法 - 保留原逻辑 */
-function LoadMore(loadNodeKey) {
+/** 加载更多核心方法 */
+const LoadMore = (loadNodeKey: string) => {
   const parts = loadNodeKey.split('__loadmore__');
   if (parts.length < 2) return;
   const parentKey = parts[0];
   const parentNode = findNodeByKey(parentKey, treeData.value);
   if (!parentNode || !parentNode._allChildren) return;
 
-  const loadNode = (parentNode.children || []).find(n => n.isLoadMore);
+  const loadNode = (parentNode.children || []).find((n: any) => n.isLoadMore);
   if (!loadNode) return;
-  if (parentNode._loading) { setTimeout(()=> LoadMore(loadNodeKey), 50); return; }
+  if (parentNode._loading) { setTimeout(() => LoadMore(loadNodeKey), 50); return; }
 
   parentNode._loading = true;
-  const loadNodeIndex = (parentNode.children || []).findIndex(n => n.key === loadNodeKey);
+  const loadNodeIndex = (parentNode.children || []).findIndex((n: any) => n.key === loadNodeKey);
   if (loadNodeIndex === -1) { parentNode._loading = false; return; }
 
   const offset = parseInt(parts[1]) || 0;
@@ -292,29 +247,29 @@ function LoadMore(loadNodeKey) {
   }
   parentNode.children = [...parentNode.children];
   parentNode._loading = false;
-}
+};
 
 /** 自动加载所有分页 */
-function autoLoadAll(parentKey) {
+const autoLoadAll = (parentKey: string) => {
   const parentNode = findNodeByKey(parentKey, treeData.value);
   if (!parentNode || !parentNode._allChildren) return;
-  const loadNode = (parentNode.children || []).find(n => n.isLoadMore);
+  const loadNode = (parentNode.children || []).find((n: any) => n.isLoadMore);
   if (!loadNode) return;
-  if (parentNode._loading) { setTimeout(()=> autoLoadAll(parentKey), 50); return; }
+  if (parentNode._loading) { setTimeout(() => autoLoadAll(parentKey), 50); return; }
   LoadMore(loadNode.key);
-  setTimeout(()=> autoLoadAll(parentKey), 30);
-}
+  setTimeout(() => autoLoadAll(parentKey), 30);
+};
 
-/** 定位并展开节点核心方法 - 保留原逻辑 */
-async function locateAndExpandNode(modelId, componentId, zoomFit = true) {
+/** 定位并展开节点核心方法 */
+const locateAndExpandNode = async (modelId: string, componentId: string, zoomFit = true) => {
   isSearching.value = true;
   try {
     const res = await postAction("/ModelStruct/GetTreePathByGId", { modelId, componentId });
-    let pathNodes = res;
+    let pathNodes = res.Data;
     if (!pathNodes || pathNodes.length === 0) return;
 
     pathNodes = [...pathNodes].reverse();
-    const pathKeys = pathNodes.map(node => `${modelId}*${node.glid}`);
+    const pathKeys = pathNodes.map((node: any) => `${modelId}*${node.glid}`);
     const targetKey = pathKeys[pathKeys.length - 1];
 
     for (const key of pathKeys.slice(0, -1)) {
@@ -326,38 +281,41 @@ async function locateAndExpandNode(modelId, componentId, zoomFit = true) {
     }
     selectedKeys.value = [targetKey];
     toolState.annotation.elementId = targetKey;
-    if(zoomFit) onSelect([targetKey], { selectedNodes: pathNodes });
+    if (zoomFit) onSelect([targetKey], { selectedNodes: pathNodes });
     scrollToTarget(pathNodes[pathNodes.length - 1].name);
   } finally {
     setTimeout(() => { isSearching.value = false; }, 500);
   }
-}
+};
 
 /** 搜索方法 - 防抖 */
-const onSearch = myDebounce((value) => {
+const onSearch = myDebounce(async (value: string) => {
   if (!value) return;
   searchLoading.value = true;
-  postAction("/ModelStruct/SearchTreeByName", {
-    name: value,
-    modelId: toolState.models[0],
-  }).then((res) => {
-    searchOptions.value = res.map(item => ({
+  try {
+    const res = await postAction("/ModelStruct/SearchTreeByName", {
+      name: value,
+      modelId: toolState.models[0],
+    });
+    searchOptions.value = res.Data.map((item: any) => ({
       value: item.name,
       label: item.name,
       id: item.glid,
       originData: item,
       modelId: item.modelId,
     }));
-  }).finally(() => searchLoading.value = false);
+  } finally {
+    searchLoading.value = false;
+  }
 }, 500);
 
 /** 搜索结果选中 */
-function onSearchResultSelect(value, option) {
+const onSearchResultSelect = (value: string, option: any) => {
   locateAndExpandNode(option.modelId, option.id);
-}
+};
 
 /** 滚动到目标节点 */
-async function scrollToTarget(nodeName) {
+const scrollToTarget = async (nodeName: string) => {
   await new Promise(resolve => setTimeout(resolve, 300));
   const allNodes = Array.from(document.querySelectorAll(".tree-node-title"));
   const matchedElements = allNodes.filter(el => {
@@ -368,10 +326,10 @@ async function scrollToTarget(nodeName) {
     const targetEl = matchedElements[matchedElements.length - 1];
     targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
   }
-}
+};
 
-/** 节点选中核心事件 - 保留原逻辑 */
-function onSelect(Keys, e) {
+/** 节点选中核心事件 */
+const onSelect = async (Keys: string[], e: any) => {
   if (Keys.length === 0) { Medusa.ClearHighlightElement(); return; }
   toolState.SelectedTag = Keys[0].split("*")[0];
   selectedKeys.value = Keys;
@@ -385,133 +343,160 @@ function onSelect(Keys, e) {
   Medusa.ClearHighlightElement();
   const elementId = Keys[0];
   let tags = elementId.split("*");
-  if(tags.length !=2) return;
+  if (tags.length !== 2) return;
   let modelId = tags[0];
   let elementGlId = tags[1];
 
-  GetChildrenIds(modelId, elementGlId, 400).then((ids) => {
-   if(ids.length ==0) return;
-    let strIds = ids.map(glid => `${modelId}*${glid}`);
-    let strId = "";
-    for(let i =0;i<strIds.length;i++){ strId+= strIds[i]+"#"; }
-    Medusa.HighLightElement(strId, 0, 31, 150, 0.7);
-    Medusa.FlyToElement(strId);
-  });
-}
+  const ids = await GetChildrenIds(modelId, elementGlId, 400);
+  if (ids.length === 0) return;
+  let strIds = ids.map((glid: string) => `${modelId}*${glid}`);
+  let strId = strIds.join("#");
+  Medusa.HighLightElement(strId, 0, 31, 150, 0.7);
+  Medusa.FlyToElement(strId);
+};
 
 /** 获取子节点ID */
-async function GetChildrenIds(modelId, parentId, count) {
-  let res = await postAction("/ModelStruct/GetModelsByParent", { modelId, parentId, count });
-  return res;
-}
+const GetChildrenIds = async (modelId: string, parentId: string, count: number) => {
+  const res = await postAction("/ModelStruct/GetModelsByParent", { modelId, parentId, count });
+  return res.Data;
+};
 
 /** 判断是否为数字 */
-function isNumber(value) {
-  return!isNaN(parseFloat(value)) && isFinite(value);
-}
+const isNumber = (value: any) => {
+  return !isNaN(parseFloat(value)) && isFinite(value);
+};
 
 /** 递归获取子节点 */
-async function GetChildren(modelId, parentId, count) {
-  let ids = [];
-  let res = await postAction("/ModelStruct/GetTreeByParent", { modelId, parentId });
-  for(let i =0;i<res.length && ids.length < count;i++){
-    if(!isNumber(res[i].glid)){
-      let subIds = await GetChildren(modelId,res[i].glid, count - ids.length);
+const GetChildren = async (modelId: string, parentId: string, count: number) => {
+  let ids: string[] = [];
+  const ress = await postAction("/ModelStruct/GetTreeByParent", { modelId, parentId });
+  const res = ress.Data;
+  for (let i = 0; i < res.length && ids.length < count; i++) {
+    if (!isNumber(res[i].glid)) {
+      let subIds = await GetChildren(modelId, res[i].glid, count - ids.length);
       ids.push(...subIds);
-      if(ids.length >= count) return ids;
+      if (ids.length >= count) return ids;
     } else {
       ids.push(res[i].glid);
     }
   }
   return ids;
-}
+};
 
 /** 添加模型 */
-function AddModel(modelId) {
+const AddModel = (modelId: string) => {
   const index = toolState.models.indexOf(modelId);
   if (index > -1) {
-    treeData.value?.filter(item => item.modelId == modelId).forEach(item => { item.isRemoved = false; });
+    treeData.value?.filter((item: any) => item.modelId == modelId).forEach(item => { item.isRemoved = false; });
     Medusa.AddModel(modelId, modelId);
   }
-}
+};
 
 /** 移除模型 */
-function OnRemove(modelId) {
+const OnRemove = (modelId: string) => {
   const index = toolState.models.indexOf(modelId);
   if (index > -1) {
-    treeData.value?.filter(item => item.modelId == modelId).forEach(item => {
+    treeData.value?.filter((item: any) => item.modelId == modelId).forEach(item => {
       item.children = [];
       item.isRemoved = true;
     });
     Medusa.RemoveModel(modelId);
   }
-}
+};
 
 /** 节点展开/收起事件 */
-function handleNodeExpand(key) {
+const handleNodeExpand = async (key: string) => {
   if (expandedKeys.value.includes(key)) {
     expandedKeys.value = expandedKeys.value.filter(k => k !== key);
   } else {
     expandedKeys.value = [...expandedKeys.value, key];
     const node = findNodeByKey(key, treeData.value);
-    if(node) onLoadData(node);
+    if (node) await onLoadData(node);
   }
-}
+};
 
 /** 节点选中事件 */
-function handleNodeSelect(key) {
+const handleNodeSelect = (key: string) => {
   selectedKeys.value = [key];
   const node = findNodeByKey(key, treeData.value);
-  if(node && !node.isLoadMore) onSelect([key], {selectedNodes:[node]});
-}
+  if (node && !node.isLoadMore) onSelect([key], { selectedNodes: [node] });
+};
 
-/** 节点点击事件 */
-function handleNodeClick(node) {
-  handleNodeExpand(node.key);
-  handleNodeSelect(node.key);
-}
+/** 关闭面板 */
+const handleClose = () => {
+  toolState.structTree = false;
+};
 
-/** 事件监听 - 加载模型信息 */
-AppEvent.addEventListener("OnLoadModelInfos", (data) => {
-  let isFirst = false;
-  toolState.models.forEach((modelId) => {
-    postAction("/File/GetFileInfoByUuid", { value: modelId }).then((res) => {
-      modelInfo.value?.push(res);
-      treeData.value = [];
-      postAction("/ModelStruct/GetTreeRoot", { value: modelId }).then((res2) => {
-        const data = res2;
-        if (data) {
-          const array = data.map((item) => ({
-            title: res.name,
-            isRoot: false,
-            isRemoved: false,
-            id: item.glid,
-            key: `${modelId}*${item.glid}`,
-            modelId: modelId,
-            isLeaf: false,
-            style: treeItemStyle,
-          }));
-          treeData.value?.push(...array);
-          if (!isFirst && !isSearching.value) {
-            isFirst = true;
-            const selectArray = [];
-            expendFirstNode(array, selectArray);
-            expandedKeys.value = selectArray;
+/** 绑定全局事件监听 */
+const bindGlobalEvent = () => {
+  // 加载模型信息
+  AppEvent.addEventListener("OnLoadModelInfos", (data) => {
+    let isFirst = false;
+    toolState.models.forEach((modelId) => {
+      postAction("/File/GetFileInfoByUuid", { value: modelId }).then((res) => {
+        modelInfo.value?.push(res.Data);
+        treeData.value = [];
+        postAction("/ModelStruct/GetTreeRoot", { value: modelId }).then((res2) => {
+          const data = res2.Data;
+          if (data) {
+            const array = data.map((item) => ({
+              title: res.Data.name,
+              isRoot: false,
+              isRemoved: false,
+              id: item.glid,
+              key: `${modelId}*${item.glid}`,
+              modelId: modelId,
+              isLeaf: false,
+              style: treeItemStyle,
+            }));
+            treeData.value?.push(...array);
+            if (!isFirst && !isSearching.value) {
+              isFirst = true;
+              const selectArray: string[] = [];
+              expendFirstNode(array, selectArray);
+              expandedKeys.value = selectArray;
+            }
           }
-        }
+        });
       });
     });
   });
+
+  // 元素选中
+  AppEvent.addEventListener("OnElementSelected", (data: ElementSelectedEventArgv) => {
+    selectedKeys.value = [];
+    Medusa.ClearHighlightElement();
+    if (data && data.ModelId && data.ElementId) {
+      locateAndExpandNode(data.ModelId, data.ElementId, false);
+    }
+  });
+};
+
+// ✅ Vue3 生命周期
+onMounted(() => {
+  // 监听面板显示 层级置顶
+  watch(() => toolState.structTree, (newVal) => {
+    if (newVal && settingRoot.value) {
+      settingRoot.value.style.zIndex = toolState.DivIndex++ + "";
+    }
+  })
+  // 绑定全局事件
+  bindGlobalEvent();
 });
 
-/** 事件监听 - 元素选中 */
-AppEvent.addEventListener("OnElementSelected", (data) => {
-  selectedKeys.value = [];
-  Medusa.ClearHighlightElement();
-  if(data && data.ModelId && data.ElementId){
-    locateAndExpandNode(data.ModelId, data.ElementId,false);
+// ✅ Vue3 内部递归组件 TreeItem (核心替代小程序template)
+// ✅ 节点展开/收起 (替代原TreeItem的toggleExpand)
+const handleToggleExpand = (node: any) => {
+  handleNodeExpand(node.key);
+};
+
+// ✅ 节点点击事件 (替代原TreeItem的handleNodeClick)
+const handleNodeClick = (node: any) => {
+  if (!node.isLoadMore) {
+    handleToggleExpand(node);
+    handleNodeSelect(node.key);
   }
-});
+};
 </script>
 
 <style scoped>
@@ -543,10 +528,12 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   align-items: center;
   cursor: move;
 }
+
 .header-title {
   font-size: 16px;
   font-weight: bold;
 }
+
 .header-close {
   font-size: 20px;
   cursor: pointer;
@@ -556,6 +543,7 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   text-align: center;
   border-radius: 4px;
 }
+
 .header-close:hover {
   background-color: #3c6bc9;
 }
@@ -571,13 +559,16 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   scrollbar-color: #3b5997 #324985;
   flex: 1;
 }
+
 .setting-content::-webkit-scrollbar {
   width: 6px;
 }
+
 .setting-content::-webkit-scrollbar-thumb {
   background-color: #3b5997;
   border-radius: 3px;
 }
+
 .setting-content::-webkit-scrollbar-track {
   background-color: #324985;
 }
@@ -588,13 +579,15 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   top: 0;
   z-index: 5;
   background-color: #324985;
-	padding: 8px 0;
+  padding: 8px 0;
 }
+
 .search-input-box {
   display: flex;
   width: 100%;
   gap: 4px;
 }
+
 .native-search-input {
   flex: 1;
   height: 32px;
@@ -605,9 +598,11 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   padding: 0 8px;
   font-size: 14px;
 }
+
 .native-search-input::placeholder {
   color: #ccc;
 }
+
 .search-btn {
   width: 60px;
   height: 32px;
@@ -617,23 +612,33 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  line-height: 32px;
+  padding: 0;
 }
+
 .search-btn.loading {
   background-color: #3b5997;
   cursor: not-allowed;
 }
+
 .loading-icon {
   display: inline-block;
   width: 16px;
-	height: 16px;
-	border: 2px solid #fff;
-	border-top: 2px solid transparent;
-	border-radius: 50%;
-	animation: loading 1s linear infinite;
+  height: 16px;
+  border: 2px solid #fff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: loading 1s linear infinite;
 }
+
 @keyframes loading {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 搜索下拉列表样式 */
@@ -646,20 +651,24 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   max-height: 200px;
   overflow-y: auto;
 }
+
 .search-option {
   display: flex;
   flex-direction: column;
   padding: 6px 8px;
   cursor: pointer;
 }
+
 .search-option:hover {
   background-color: #3c6bc9;
 }
+
 .option-name {
   font-weight: bold;
   color: #FFF;
   font-size: 14px;
 }
+
 .option-path {
   font-size: 11px;
   color: #ccc;
@@ -668,14 +677,16 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   white-space: nowrap;
 }
 
-/* ✅ 纯原生树形结构核心样式 - 含连接线、缩进、选中高亮 */
+/* 纯原生树形结构核心样式 - 含连接线、缩进、选中高亮 */
 .native-tree-container {
   width: 100%;
   color: #fff;
 }
+
 .tree-node-wrap {
   width: 100%;
 }
+
 .tree-node-header {
   height: 32px;
   line-height: 32px;
@@ -685,9 +696,11 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   padding: 0 4px;
   border-radius: 2px;
 }
+
 .tree-node-header.selected {
   background-color: #3471cb;
 }
+
 .tree-expand-btn {
   width: 16px;
   height: 32px;
@@ -697,9 +710,11 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   color: #ccc;
   flex-shrink: 0;
 }
+
 .tree-empty-btn {
   width: 16px;
 }
+
 .tree-icon {
   width: 18px;
   height: 18px;
@@ -707,6 +722,7 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   display: block;
   margin: 0 6px;
 }
+
 .load-more-icon {
   width: 18px;
   height: 18px;
@@ -715,6 +731,7 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   margin: 0 6px;
   font-size: 16px;
 }
+
 .tree-node-title {
   flex: 1;
   overflow: hidden;
@@ -724,10 +741,12 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   justify-content: space-between;
   align-items: center;
 }
+
 .load-more-node {
   color: #40a9ff;
   cursor: pointer;
 }
+
 .load-more-node:hover {
   text-decoration: underline;
 }
@@ -736,6 +755,7 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
 .tree-action-box {
   margin-left: 8px;
 }
+
 .tree-action-tag {
   width: 24px;
   height: 24px;
@@ -747,6 +767,7 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   cursor: pointer;
   font-size: 14px;
 }
+
 .tree-action-tag:hover {
   background-color: #3c6bc9;
 }
@@ -756,6 +777,7 @@ AppEvent.addEventListener("OnElementSelected", (data) => {
   padding-left: 20px;
   position: relative;
 }
+
 .tree-children-line {
   position: absolute;
   left: 0;

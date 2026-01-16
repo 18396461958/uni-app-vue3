@@ -49,7 +49,7 @@ function handleHomeClick() {
     height: 40px;
     color: white;
     min-width: 200px;
-    bottom: 100px;
+    bottom: 4px;
     left: 50%;
     transform: translateX(-50%);
     background-color: #0A2772;

@@ -1,40 +1,68 @@
 <template>
-    <!-- div 替换为 uni-app 原生view组件 -->
-    <view class="took-button-root" @click="handleClick">
-        <!-- a-tooltip 替换为 uni-app 原生提示组件 uni-tooltip -->
-        <!-- 移除多语言，直接写中文提示文本，placement驼峰改短横线（uni规范） -->
-        <uni-tooltip placement="top-left" title="隐藏">
-            <!-- img 替换为 uni-app 原生图片组件 image -->
-            <image src="@/static/icons/icon_title_close@3x.png" mode="widthFix"></image>
-        </uni-tooltip>
-    </view>
+  <!-- 根容器 纯原生view标签，保留点击事件 -->
+  <view class="took-button-root" @click="handleClick">
+    <!-- 关闭图标 纯原生image标签，保留原有图片地址和适配模式 -->
+    <image src="@/static/icons/icon_title_close@3x.png" mode="widthFix" class="close-icon" />
+    <!-- ✅ 纯原生手写提示框 替代 uni-tooltip 组件，无任何封装，纯view+text实现 -->
+    <view class="native-tooltip">隐藏</view>
+  </view>
 </template>
 
 <script lang="ts" setup>
-// 保留vue3的组合式API，uni-app完美兼容
-
-// 1. 彻底移除 useI18n 所有相关导入和变量定义
-// 2. 保留原有的点击事件派发逻辑不变
+// 保留vue3组合式API，纯原生逻辑，无任何多余导入
 const emit = defineEmits(["click"]);
 
-// 处理点击事件，抛出click事件给父组件
+// 原有点击事件逻辑不变，点击向外派发click事件给父组件
 function handleClick() {
-    emit("click");
+  emit("click");
 }
 </script>
 
 <style lang="css" scoped>
+/* 根容器样式 */
 .took-button-root {
-    /* 核心修改：移除 cursor: pointer; 
-       原因：该属性是H5专属，小程序/APP端完全无效，uni-app中不要写 */
+  position: relative; /* 给原生提示框做定位父级，必加 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-/* 给图片加基础样式，适配图标正常显示，可根据你的图标尺寸微调 */
-.took-button-root image {
-    width: 24rpx;
-    height: 24rpx;
+
+/* 关闭图标样式，保留原尺寸，可自行微调rpx数值 */
+.close-icon {
+  width: 24rpx;
+  height: 24rpx;
 }
-/* 补充uni-app跨端的点击反馈效果，替代原cursor手型，提升交互体验 */
+
+/* ✅ 核心：纯原生tooltip提示框样式 完全复刻原top-left的显示位置 */
+.native-tooltip {
+  /* 定位：左上方，和原uni-tooltip的placement="top-left"完全一致 */
+  position: absolute;
+  top: -30rpx;
+  left: -60rpx;
+  /* 提示框样式 */
+  background-color: #333333;
+  color: #ffffff;
+  font-size: 20rpx;
+  padding: 8rpx 12rpx;
+  border-radius: 6rpx;
+  white-space: nowrap;
+  /* 默认隐藏提示框 */
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none; /* 不遮挡点击事件，必加 */
+  z-index: 999;
+}
+
+/* 鼠标悬浮/手指长按 显示提示框 纯原生css触发，兼容H5 */
+.took-button-root:hover .native-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ✅ 补充全端兼容的点击反馈效果 替代H5的cursor:pointer */
+/* 小程序/App/H5都生效，点击图标时的透明反馈，提升交互体验 */
 .took-button-root:active {
-    opacity: 0.8;
+  opacity: 0.8;
 }
 </style>
