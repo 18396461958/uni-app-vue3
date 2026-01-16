@@ -153,7 +153,7 @@ function AddMarker() {
 	if(editMarker) {
 		editMarker.name = inputName.value;
 		postAction("/maker/UpdateMarker", editMarker).then((res: any) => {
-			const result:IMarker = res;
+			const result:IMarker = res.Data;
 			result.isShow = true;
 			Medusa.RemoveMarker(result.id);
 			Medusa.AddMarker(
@@ -164,7 +164,7 @@ function AddMarker() {
 				markStyle.value.frameColor,
 				color_rbg.value
 			);
-			res.isShow = true;
+			res.Data.isShow = true;
 			editMarker = null;
 		});
 	} else {
@@ -180,9 +180,9 @@ function AddMarker() {
 				elementId: ToolStore.annotation.elementId,
 			};
 			postAction("/maker/AddMarker", marker).then((res: any) => {
-				const result:IMarker = res;
-				res.isShow = true;
-				markerList.value.push(res);
+				const result:IMarker = res.Data;
+				res.Data.isShow = true;
+				markerList.value.push(res.Data);
 				Medusa.AddMarker(
 					result.id,
 					result.position.split(","),
@@ -273,7 +273,7 @@ function initData(modelId: string[]) {
 	modelIds.value = modelId;
 	postAction("/maker/GetMarkersByModels", { value: modelId }).then((res: any) => {
 		markerList.value = [];
-		markerList.value.push(...res);
+		markerList.value.push(...res.Data);
 	})
 }
 
@@ -298,12 +298,12 @@ function formatDate(dateStr: string) {
 <style scoped>
 .setting-root {
 	color: #FFF;
-	width: 340px;
+	width: 20%;
 	height: calc(100vh - 10%);
 	background-color: #324985;
 	position: fixed;
-	top: 74px;
-	right: 10px;
+	top: 0px;
+	right: 0px;
 	border: #3471cb solid 1px;
 	box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
 	z-index: 1000;

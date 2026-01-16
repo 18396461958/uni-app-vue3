@@ -153,12 +153,12 @@ watch(() => ToolStore.ViewPoint, (newVal) => {
 <style scoped>
 .setting-root {
 	color: #FFF;
-	width: 340px;
+	width: 20%;
 	height: calc(100vh - 10%);
 	background-color: #324985;
 	position: fixed;
-	top: 74px;
-	right: 10px;
+	top: 0px;
+	right: 0px;
 	border: #3471cb solid 1px;
 	box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
 	z-index: 1000;

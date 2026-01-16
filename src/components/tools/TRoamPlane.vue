@@ -342,7 +342,7 @@ AppEvent.addEventListener("OnDrawRoamPath", (e)=>{
             "dataType": "draw",
         }).then((res:any) => {
             uni.showToast({title:'保存成功',icon:'success',duration:1500});
-            RoamPathList.value.push(res);
+            RoamPathList.value.push(res.Data);
         }).catch((err:any) => {
             uni.showToast({title:'保存失败',icon:'none',duration:1500,mask:true});
         }).finally(() => {
@@ -394,7 +394,7 @@ function OnOk(){
                     "view": view,
                 }).then((res:any) => {
                     uni.showToast({title:'保存成功',icon:'success',duration:1500}); 
-                    RoamPositionList.value.push(res);
+                    RoamPositionList.value.push(res.Data);
                 }).catch((err:any) => {
                     uni.showToast({title:'保存失败',icon:'none',duration:1500,mask:true});
                 }).finally(() => {
@@ -411,7 +411,7 @@ function OnOk(){
                 "view": personRoam.view, 
             }).then((res:any) => {
                 uni.showToast({title:'保存成功',icon:'success',duration:1500});
-                RoamPathList.value.push(res);
+                RoamPathList.value.push(res.Data);
             }).catch((err:any) => {
                 uni.showToast({title:'保存失败',icon:'none',duration:1500,mask:true});
             }).finally(() => {
@@ -503,11 +503,11 @@ watch(() => toolState.Roam, (newValue) => {
         Medusa.SetRoamPersonScale(personSize.value);
         postAction("/roam/getRoamPositions", { value: toolState.projectId }).then((res: any) => {
             RoamPositionList.value = [];
-            RoamPositionList.value.push(...res);
+            RoamPositionList.value.push(...res.Data);
         })
         postAction("/roam/getRoamPaths", { value: toolState.projectId }).then((res: any) => {
             RoamPathList.value = [];
-            RoamPathList.value.push(...res);
+            RoamPathList.value.push(...res.Data);
         })
         if (newValue && settingRoot.value) {
             settingRoot.value.style.zIndex=toolState.DivIndex+++"";
@@ -541,12 +541,12 @@ watch(() => curRoam.value, (newValue) => {
 <style scoped>
 .setting-root {
     color: #FFF;
-    width: 340px;
+    width: 20%;
     height: calc(100vh - 10%);
     background-color: #324985;
     position: fixed;
-    top: 74px;
-    right: 10px;
+    top: 0px;
+    right: 0px;
     border: #3471cb solid 1px;
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
     z-index: 1000;

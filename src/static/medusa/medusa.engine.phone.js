@@ -158,7 +158,7 @@ function SendMessage(info) {
   strs = msg.toString().split("_");
   if (strs[0] == "StartMeasure") DT_bMeasure = true; // 如果开始测量打开状态
   if (strs[0] == "StopMeasure") DT_bMeasure = false; // 如果开始测量关闭状态
-  // console.log("client msg:"+msg);
+  console.log("client msg:"+msg);
   message.destinationName = DT_ChannelName;
   if (client && client.isConnected()) {
       client.send(message);

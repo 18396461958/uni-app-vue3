@@ -20,7 +20,7 @@
             <!-- 动态天空 -->
             <view class="setting-item">
                 <text>动态天空</text>
-                <view class="native-switch" :class="{'active': dySky}" @click="handleDayStatusChange">
+                <view class="native-switch" :class="{'active': dySky}" @click="handleDayStatusChange2">
                     <text class="switch-text">{{ dySky ? '开' : '关' }}</text>
                 </view>
             </view>
@@ -106,14 +106,18 @@ Medusa.RegisterStatusCallBack("TimeModeState", (value:string) => {
 
 // ✅ 保留所有原事件处理方法，逻辑完全不变
 function handleDayStatusChange() {
-    Medusa.SetDynamicCloud(dySky.value);
-    Medusa.SetTimeMode(dayStatus.value?1:0);
+
+    Medusa.SetTimeMode(!dayStatus.value?1:0);
+}
+function handleDayStatusChange2() {
+    Medusa.SetDynamicCloud(!dySky.value);
+
 }
 
 let TestThread: any;
 
 function handleShadowChange() {
-    shadow.value ? Medusa.SetShadowMode(1) : Medusa.SetShadowMode(0);
+    !shadow.value ? Medusa.SetShadowMode(1) : Medusa.SetShadowMode(0);
     // 手动同步开关状态，原生开关需手动赋值
     shadow.value = !shadow.value;
 }
@@ -137,7 +141,7 @@ function handleTesChange() {
 }
 
 function handleSeaChange() {
-    if(ocean.value) {
+    if(!ocean.value) {
         Medusa.AddOcean();
     } else {
         Medusa.ClearOcean();

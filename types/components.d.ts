@@ -13,9 +13,16 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AgreePrivacy: typeof import('./../src/components/agree-privacy/index.vue')['default']
+    BoxPanel: typeof import('./../src/components/tools/BoxPanel.vue')['default']
+    DoubleSlider: typeof import('./../src/components/tools/DoubleSlider.vue')['default']
     LangSelect: typeof import('./../src/components/lang-select/index.vue')['default']
+    NativeSegmented: typeof import('./../src/components/tools/NativeSegmented.vue')['default']
+    PlanePanel: typeof import('./../src/components/tools/PlanePanel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SettingHeader: typeof import('./../src/components/tools/SettingHeader.vue')['default']
+    SingleSlider: typeof import('./../src/components/tools/SingleSlider.vue')['default']
+    StandardPanel: typeof import('./../src/components/tools/StandardPanel.vue')['default']
     TButton: typeof import('./../src/components/tools/TButton.vue')['default']
     TElementOpt: typeof import('./../src/components/tools/TElementOpt.vue')['default']
     TElementOptPlane: typeof import('./../src/components/tools/TElementOptPlane.vue')['default']
@@ -55,9 +62,16 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const AgreePrivacy: typeof import('./../src/components/agree-privacy/index.vue')['default']
+  const BoxPanel: typeof import('./../src/components/tools/BoxPanel.vue')['default']
+  const DoubleSlider: typeof import('./../src/components/tools/DoubleSlider.vue')['default']
   const LangSelect: typeof import('./../src/components/lang-select/index.vue')['default']
+  const NativeSegmented: typeof import('./../src/components/tools/NativeSegmented.vue')['default']
+  const PlanePanel: typeof import('./../src/components/tools/PlanePanel.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
+  const SettingHeader: typeof import('./../src/components/tools/SettingHeader.vue')['default']
+  const SingleSlider: typeof import('./../src/components/tools/SingleSlider.vue')['default']
+  const StandardPanel: typeof import('./../src/components/tools/StandardPanel.vue')['default']
   const TButton: typeof import('./../src/components/tools/TButton.vue')['default']
   const TElementOpt: typeof import('./../src/components/tools/TElementOpt.vue')['default']
   const TElementOptPlane: typeof import('./../src/components/tools/TElementOptPlane.vue')['default']

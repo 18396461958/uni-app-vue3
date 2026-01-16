@@ -103,7 +103,7 @@ export default {
           view: view, 
           image: img 
         }).then((res) => {
-          this.viewPoints.push(res);
+          this.viewPoints.push(res.Data);
           this.inputName = ""; // 清空输入框
         });
       });
@@ -136,7 +136,7 @@ export default {
       this.modelIds = modelId;
       postAction("/ViewPoint/GetViewPointByModels", { value: modelId }).then((res) => {
         this.viewPoints = [];
-        this.viewPoints.push(...res);
+        this.viewPoints.push(...res.Data);
       })
     },
     // 原生日期格式化方法【替代moment】，纯JS实现，无任何依赖
@@ -158,12 +158,12 @@ export default {
 <style scoped>
 .setting-root {
   color: #FFF;
-  width: 340px;
+  width: 20%;
   height: calc(100vh - 10%);
   background-color: #324985;
   position: fixed;
-  top: 74px;
-  right: 10px;
+  top: 0px;
+  right: 0px;
   border: #3471cb solid 1px;
   box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
   z-index: 1000;
