@@ -123,7 +123,7 @@ function responseInterceptors(http: HttpRequestAbstract) {
     // 自定义参数
     const custom = config?.custom;
     // 登录状态失效，重新登录
-    if (data.code == 401) {
+    if (data.code == 401 || data.code == 404) {
       uni.redirectTo({
         url: `${LOGIN_PATH}`,
       });
@@ -147,7 +147,7 @@ function responseInterceptors(http: HttpRequestAbstract) {
     // 请求失败则抛出错误
     return Promise.reject(data);
   }, (response: HttpError) => {
-    if (response.statusCode == 401) {
+    if (response.statusCode == 401 || response.statusCode == 404) {
       uni.redirectTo({
         url: `${LOGIN_PATH}`,
       });

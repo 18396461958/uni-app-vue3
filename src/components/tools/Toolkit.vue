@@ -3,11 +3,11 @@
         <THome @click="handleHomeClick" />
         <image src="@/static/icons/icon_title_add@2x.png" mode="widthFix" style="height: 30px;width: 30px;cursor: pointer;" @click="Big" @touch="Big"/>
         <image src="@/static/icons/icon_title_sub@2x.png" mode="widthFix" style="height: 30px;width: 30px;cursor: pointer;" @click="Small" @touch="Small"/>
-        <TSection />
+        <!-- <TSection />
         <TRoam />
         <TMeasure />
         <TViewPoint/>
-        <TMarker/>
+        <TMarker/> -->
         <!-- <THide /> -->
         <TTree />
         <TProperties />
