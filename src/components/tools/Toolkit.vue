@@ -1,6 +1,8 @@
 <template>
     <view class="tool-root">
         <THome @click="handleHomeClick" />
+        <image src="@/static/icons/icon_title_add@2x.png" mode="widthFix" style="height: 30px;width: 30px;cursor: pointer;" @click="Big" @touch="Big"/>
+        <image src="@/static/icons/icon_title_sub@2x.png" mode="widthFix" style="height: 30px;width: 30px;cursor: pointer;" @click="Small" @touch="Small"/>
         <TSection />
         <TRoam />
         <TMeasure />
@@ -36,6 +38,13 @@ import TTest from "./TTest.vue";
 // 示例：处理点击事件时调用 streamEngine 的方法
 function handleHomeClick() {
     Medusa.ResetViewPort();
+}
+function Big() {
+    SendMessage("OnWheel_100_822_868");
+
+}
+function Small() {
+    SendMessage("OnWheel_-100_822_868");
 }
 </script>
 

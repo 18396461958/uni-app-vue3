@@ -4,7 +4,7 @@
         <!-- 核心：删除uni-tooltip，用纯原生view手写悬浮提示框（左上定位，原提示文字：重置视角） -->
         <view class="tooltip-box">重置视角</view>
         <!-- 纯原生image标签 替代img标签（uni-app原生推荐，多端兼容性远高于img，纯原生无封装） -->
-        <image class="home-icon" src="@/static/img/home36x36.png" mode="widthFix" alt="首页"></image>
+        <image class="home-icon" src="@/static/img/home36x36.png" mode="widthFix" alt="重置视角"></image>
     </view>
 </template>
 
