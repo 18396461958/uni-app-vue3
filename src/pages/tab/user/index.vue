@@ -34,6 +34,7 @@
     </view>
 
     <!-- 原生实现 引擎核心操作模块 -->
+
     <view class="mt-20rpx">
       <view class="native-cell-group">
         <view class="native-cell" @click="handleCellClick('engineStart')">
@@ -67,21 +68,21 @@
           <view class="cell-title">缓存清理</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
-        <view class="native-cell" @click="handleCellClick('engineLog')">
+        <!-- <view class="native-cell" @click="handleCellClick('engineLog')">
           <view class="cell-icon icon file-text" style="font-size:22px;color:#666;"></view>
           <view class="cell-title">运行日志</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
-        </view>
-        <view class="native-cell" @click="handleCellClick('dataBackup')">
+        </view> -->
+        <!-- <view class="native-cell" @click="handleCellClick('dataBackup')">
           <view class="cell-icon icon download" style="font-size:22px;color:#666;"></view>
           <view class="cell-title">数据备份</view>
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
-        </view>
+        </view> -->
       </view>
     </view>
 
     <!-- 原生实现 引擎插件与服务模块 -->
-    <view class="mt-20rpx">
+    <!-- <view class="mt-20rpx">
       <view class="native-cell-group">
         <view class="native-cell" @click="handleCellClick('pluginManage')">
           <view class="cell-icon icon layers" style="font-size:22px;color:#666;"></view>
@@ -99,7 +100,7 @@
           <view class="cell-arrow icon arrowright" style="font-size:20px;color:#969799;"></view>
         </view>
       </view>
-    </view>
+    </view> -->
 
     <!-- 原生实现 引擎系统设置模块 -->
     <view class="mt-20rpx">
@@ -111,11 +112,21 @@
         </view>
       </view>
     </view>
+
+    <!-- ✅ 新增：底部全屏红色退出登录大按钮 -->
+    <view class="logout-btn-wrap mt-60rpx mb-40rpx">
+      <view class="logout-btn" @click="handleLogout">
+        <view class="icon logout" style="font-size:26px;color:#fff;margin-right:12rpx;"></view>
+        <view class="logout-text">退出登录</view>
+      </view>
+    </view>
+
   </view>
 </template>
 
 <script setup lang="ts">
 import { usePermission } from '@/hooks';
+import { clearToken } from '@/utils';
 
 // 引擎刷新/重载事件
 const handleEngineRefresh = () => {
@@ -181,6 +192,35 @@ const handleCellClick = (type: string) => {
     case 'systemSetting': uni.navigateTo({ url: '/pages/engine/setting/setting' }); break;
     default: uni.showToast({ title: '功能开发中', icon: 'none' }); break;
   }
+};
+
+// ✅ 新增：退出登录核心事件【完整保留、可直接扩展业务】
+const handleLogout = () => {
+  uni.showModal({
+    title: '退出登录',
+    content: '确定要退出当前账号吗？',
+    confirmColor: '#ed4014',
+    async success(res) {
+      if (res.confirm) {
+        // 点击【确定】执行退出逻辑
+        uni.showLoading({ title: '退出中...' });
+        try {
+          clearToken();
+          
+          uni.hideLoading();
+          uni.showToast({ title: '退出成功', icon: 'success', duration: 1500 });
+          // 退出后跳转登录页，禁止返回上一页
+          setTimeout(() => {
+            uni.reLaunch({ url: '/pages/login/login' });
+          }, 1500);
+        } catch (error) {
+          uni.hideLoading();
+          uni.showToast({ title: '退出失败，请重试', icon: 'error' });
+          console.error('退出登录异常：', error);
+        }
+      }
+    }
+  })
 };
 
 // 引擎鉴权+状态检测 页面展示时执行
@@ -260,7 +300,7 @@ onShow(async () => {
 // 原生导航栏样式 还原u-navbar的占位+右侧相机图标
 .native-navbar {
   width: 100%;
-  height: var(--status-bar-height);
+  height: 40px;
   box-sizing: border-box;
   padding: 0 20rpx;
   display: flex;
@@ -356,4 +396,36 @@ onShow(async () => {
 // .cloud-download::before { content: "\e610"; }
 // .bar-chart::before { content: "\e868"; }
 // .setting::before { content: "\e637"; }
+// ✅ 新增：退出登录图标unicode
+//.logout::before { content: "\e646"; }
+
+// ✅ 新增：退出登录按钮完整样式 (红色主题 全屏大按钮)
+.logout-btn-wrap {
+  padding: 0 20rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+.logout-btn {
+  width: 100%;
+  background-color: #ed4014; // 和停止引擎统一红色
+  color: #fff;
+  text-align: center;
+  padding: 32rpx 0;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  // 点击按压态 深色反馈
+  &:active {
+    background-color: #d83610;
+  }
+}
+.logout-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
 </style>

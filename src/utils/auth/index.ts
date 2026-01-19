@@ -1,3 +1,5 @@
+import { LOGIN_PATH } from "@/router";
+
 const TokenKey = 'admin-token';
 const TokenPrefix = 'Bearer ';
 function isLogin() {
@@ -11,5 +13,8 @@ function setToken(token: string) {
 }
 function clearToken() {
   uni.removeStorageSync(TokenKey);
+  uni.redirectTo({
+    url: `${LOGIN_PATH}`,
+  });
 }
 export { clearToken, getToken, isLogin, setToken, TokenPrefix };

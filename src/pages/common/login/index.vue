@@ -1,5 +1,5 @@
 <template>
-  <view>
+  <view class="page-root">
     <view class="login-form-wrap">
       <view class="title">
         欢迎使用Medusa引擎
@@ -145,9 +145,9 @@ async function submit() {
 }
 
 onLoad((options: any) => {
-  if (options.redirect && removeQueryString(options.redirect) !== LOGIN_PATH) {
-    redirect = decodeURIComponent(options.redirect);
-  }
+  // if (options.redirect && removeQueryString(options.redirect) !== LOGIN_PATH) {
+  //   redirect = decodeURIComponent(options.redirect);
+  // }
 });
 
 // 组件卸载时清除定时器
@@ -159,43 +159,92 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+// 根容器 核心：实现整体页面 居中偏上 布局
+.page-root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding-top: 40rpx;
+  box-sizing: border-box;
+}
+
 .login-form-wrap {
-  @apply mt-80rpx mx-auto mb-0 w-600rpx;
+  @apply mx-auto mb-0 w-600rpx;
+  // ✅ 核心调整：上间距减少+适中 实现居中偏上，视觉重心完美
+  margin-top: 60rpx;
+  flex-shrink: 0;
 
   .title {
-    @apply mb-100rpx text-60rpx text-left font-500;
+    @apply mb-80rpx text-60rpx text-left font-600;
+    color: #333;
+    letter-spacing: 2rpx;
+    font-size: 24px;
+    margin-top: 48px
   }
 
+  // 账号输入框 - 圆润下划线+柔和边框+内边距优化
   .input-border {
-    @apply pb-6rpx mb-10rpx text-left border-0 border-b-1 border-b-solid border-b-#e4e7ed;
-  }
-
-  .input-wrap {
-    @apply pb-6rpx border-0 border-b-1 border-b-solid border-b-#e4e7ed;
-  }
-
-  .code-btn {
-    @apply py-4rpx px-16rpx text-24rpx bg-transparent border-1 border-solid border-#2979ff text-#2979ff rounded-8rpx;
-    
-    &:disabled {
-      @apply border-#c0c4cc text-#c0c4cc;
+    @apply pb-8rpx pt-4rpx mb-10rpx text-left border-0 border-b-1 border-b-solid text-30rpx;
+    border-color: #E5E6EB;
+    caret-color: #ff7900;
+    &::placeholder {
+      color: #C0C4CC;
     }
   }
 
+  // 验证码/密码输入框容器 - 同风格柔和下划线
+  .input-wrap {
+    @apply pb-8rpx pt-4rpx border-0 border-b-1 border-b-solid text-30rpx;
+    border-color: #E5E6EB;
+    & input::placeholder {
+      color: #C0C4CC;
+    }
+  }
+
+  // ✅ 验证码按钮 极致圆润胶囊款+移动端触控优化+柔和配色
+  .code-btn {
+    @apply py-8rpx px-20rpx text-26rpx bg-transparent border-1 border-solid rounded-20rpx;
+    border-color: #2979ff;
+    color: #2979ff;
+    min-width: 180rpx;
+    margin-left: 10rpx;
+    
+    &:disabled {
+      @apply border-#E5E6EB text-#C0C4CC bg-#F7F8FA;
+    }
+    // 按压反馈
+    &:active {
+      background: #E8F3FF;
+    }
+  }
+
+  // ✅ 核心优化：登录按钮 超大圆角+圆润质感+无默认边框+完美触控尺寸
   .login-btn {
-    @apply flex items-center justify-center py-12rpx px-0 text-30rpx bg-#fdf3d0 border-none w-full rounded-8rpx;
-
+    @apply flex items-center justify-center py-20rpx px-0 text-32rpx border-none w-full rounded-24rpx mt-60rpx font-500;
     color: #909399;
-
+    background: #fdf3d0;
+    // 清除uniapp默认按钮边框
     &::after {
       @apply border-none;
     }
+    // 激活态加深一点 提升质感
+    &:active {
+      opacity: 0.92;
+    }
   }
 
+  // 底部选项 - 圆润柔和配色+间距优化
   .alternative {
-    @apply flex justify-between mt-30rpx;
-
-    color: #909399;
+    @apply flex justify-between mt-40rpx text-26rpx;
+    color: #666;
+    .password, .issue {
+      padding: 8rpx 12rpx;
+      border-radius: 12rpx;
+    }
+    .password:active, .issue:active {
+      background: #F2F3F5;
+    }
   }
 }
 
@@ -204,20 +253,17 @@ onUnmounted(() => {
 
   .item {
     @apply flex items-center flex-col text-28rpx;
-
     color: #606266;
   }
   
   .icon-image {
-    @apply w-70rpx h-70rpx mb-10rpx;
+    @apply w-70rpx h-70rpx mb-10rpx rounded-16rpx;
   }
 }
 
 .hint {
   @apply px-40rpx py-20rpx text-24rpx;
-
   color: #909399;
-
   .link {
     color: #ff7900;
   }
