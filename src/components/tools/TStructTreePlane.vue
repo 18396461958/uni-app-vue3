@@ -460,7 +460,7 @@ const handleNodeClick = (node: any) => {
 /* 根容器样式 保留原样式 */
 .setting-root {
   color: #fff;
-  width: 20vw;
+  width: 25vw;
   height: calc(100vh - 10%);
   background-color: #324985;
   position: fixed;

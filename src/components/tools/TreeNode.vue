@@ -86,13 +86,14 @@ defineEmits(['toggle-expand', 'node-click', 'load-more', 'model-action'])
   width: 100%;
 }
 
+/** 核心压缩：节点行高从32→26，内边距缩小，整体高度省空间 **/
 .tree-node-header {
-  height: 32px;
-  line-height: 32px;
+  height: 26px;
+  line-height: 26px;
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 2px; /* 左右内边距减半 */
   border-radius: 2px;
 }
 
@@ -100,37 +101,40 @@ defineEmits(['toggle-expand', 'node-click', 'load-more', 'model-action'])
   background-color: #3471cb;
 }
 
+/** 展开/收起按钮 紧凑化：宽度缩小+字号缩小+行高同步 **/
 .tree-expand-btn {
-  width: 16px;
-  height: 32px;
-  line-height: 32px;
+  width: 12px; /* 宽度从16→12 */
+  height: 26px;
+  line-height: 26px;
   text-align: center;
-  font-size: 14px;
+  font-size: 11px; /* 按钮字号缩小 */
   color: #ccc;
   flex-shrink: 0;
 }
 
 .tree-empty-btn {
-  width: 16px;
+  width: 12px; /* 和按钮同宽，对齐更紧凑 */
 }
 
+/** 节点图标 缩小+间距缩小，横向省空间 **/
 .tree-icon {
-  width: 18px;
-  height: 18px;
+  width: 14px;  /* 图标尺寸从18→14 */
+  height: 14px;
   flex-shrink: 0;
   display: block;
-  margin: 0 6px;
+  margin: 0 4px; /* 左右间距从6→4 */
 }
 
 .load-more-icon {
-  width: 18px;
-  height: 18px;
-  line-height: 18px;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
   text-align: center;
-  margin: 0 6px;
-  font-size: 16px;
+  margin: 0 4px;
+  font-size: 12px; /* 加载图标字号缩小 */
 }
 
+/** 标题区 继承全局12px小字体，保留省略号逻辑，间距紧凑 **/
 .tree-node-title {
   flex: 1;
   overflow: hidden;
@@ -139,39 +143,44 @@ defineEmits(['toggle-expand', 'node-click', 'load-more', 'model-action'])
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: inherit; /* 继承父级12px小字体 */
 }
 
 .load-more-node {
   color: #40a9ff;
   cursor: pointer;
+  font-size: 12px;
 }
 
 .load-more-node:hover {
   text-decoration: underline;
 }
 
+/** 操作按钮区 间距缩小，按钮尺寸缩小，适配紧凑布局 **/
 .tree-action-box {
-  margin-left: 8px;
+  margin-left: 4px; /* 间距从8→4 */
 }
 
 .tree-action-tag {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
+  width: 20px;  /* 按钮尺寸从24→20 */
+  height: 20px;
+  line-height: 20px;
   text-align: center;
   background-color: #355ea8;
   border: 1px solid #3471cb;
-  border-radius: 2px;
+	border-radius: 2px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 11px; /* 按钮图标字号缩小 */
+  flex-shrink: 0;
 }
 
 .tree-action-tag:hover {
   background-color: #3c6bc9;
 }
 
+/** 核心优化：子节点缩进从20→14，移动端横向巨省空间！！ **/
 .tree-children-wrap {
-  padding-left: 20px;
+  padding-left: 14px; /* 子节点缩进大幅缩小，关键优化 */
   position: relative;
 }
 
@@ -180,8 +189,8 @@ defineEmits(['toggle-expand', 'node-click', 'load-more', 'model-action'])
   left: 0;
   top: 0;
   bottom: 0;
-  width: 1px;
-  background-color: #3b5997;
+	width: 1px;
+	background-color: #3b5997;
 }
 
 .line-limit-length {

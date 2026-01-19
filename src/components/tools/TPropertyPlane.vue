@@ -48,10 +48,6 @@ const activeKey = ref<number[]>([]);
 const Properties = ref<PropertyGroup[]>([]);
 const settingRoot = ref<HTMLElement | null>(null);
 
-// ========== 移除所有i18n多语言相关代码 ==========
-// 移除 import { useI18n } from 'vue-i18n'
-// 移除 const { t: $t } = useI18n();
-
 // ========== 拖拽实例 保留原有拖拽逻辑 ==========
 const dragHelper = new DragHelper(settingRoot);
 // 封装拖拽触发方法 供模板原生调用
@@ -59,7 +55,7 @@ const startDrag = () => {
     dragHelper.startDrag();
 };
 
-// ========== 原生折叠面板 展开/收起切换方法 (替代原a-collapse的v-model:activeKey逻辑) ==========
+// ========== 原生折叠面板 展开/收起切换方法 ==========
 const toggleCollapse = (index: number) => {
     const keyIndex = activeKey.value.indexOf(index);
     if (keyIndex > -1) {
@@ -91,7 +87,7 @@ watch(() => ToolStore.Property, (newVal) => {
     }
 })
    
-// ========== 原有接口请求逻辑 仅移除多语言，替换为中文 ==========
+// ========== 原有接口请求逻辑 完全保留 ==========
 function initProperty(modelId: string, elementId: string) {
     postAction("/ModelStruct/GetProperty", { modelId: modelId, componentId: elementId }).then((res: any) => {
         const ps: { [key: string]: Property[] } = {};
@@ -111,7 +107,6 @@ function initProperty(modelId: string, elementId: string) {
                 value: val,
             });
         });
-        // ✅ 移除多语言 $t 替换为纯中文「基本属性」
         Properties.value = Object.keys(ps).map((key) => ({
             name: (key == null || key == "" || key == "null") ? "基本属性" : key,
             children: ps[key],
@@ -125,23 +120,24 @@ function initProperty(modelId: string, elementId: string) {
 <style scoped>
 .setting-root {
     color: #FFF;
-    width: 20vw;
+    width: 25vw;
     height: calc(100vh - 10%);
     background-color: #324985;
     position: fixed;
     top: 0px;
     right: 0px;
     border: #3471cb solid 1px;
-    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.2);
     z-index: 1000;
+    box-sizing: border-box;
 }
 
-/* 新增：原生头部样式 完全匹配原TPlaneHeader视觉+布局 */
+/* ✅ 头部 高度压缩40→28 极致紧凑 保留拖拽功能 */
 .setting-header {
-    height: 40px;
-    line-height: 40px;
+    height: 28px;
+    line-height: 28px;
     background-color: #3b5997;
-    padding: 0 15px;
+    padding: 0 8px; /* ✅ 内边距减半 左右紧凑 */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -149,15 +145,15 @@ function initProperty(modelId: string, elementId: string) {
     cursor: move;
 }
 .header-title {
-    font-size: 18px;
+    font-size: 12px; /* ✅ 标题字体缩小 18→12 */
     font-weight: 500;
 }
 .header-close {
-    font-size: 20px;
+    font-size: 14px; /* ✅ 关闭按钮缩小 20→14 */
     cursor: pointer;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
+    width: 22px; /* ✅ 按钮尺寸缩小 30→22 */
+    height: 22px;
+    line-height: 22px;
     text-align: center;
     border-radius: 50%;
 }
@@ -165,9 +161,10 @@ function initProperty(modelId: string, elementId: string) {
     background-color: #324985;
 }
 
+/* ✅ 分组容器 字体缩小16→11 间距更紧凑 */
 .setting-group {
     background-color: #3b5997;
-    font-size: 16px;
+    font-size: 11px;
     padding-left: 1px;
 	padding-right: 1px;
 	margin-bottom: 1px;
@@ -175,11 +172,11 @@ function initProperty(modelId: string, elementId: string) {
 	border: none;
 }
 
-/* 新增：原生折叠面板头部样式 视觉和交互匹配原组件 */
+/* ✅ 折叠面板头部 高度压缩40→26 核心紧凑项 */
 .collapse-header {
-    height: 40px;
-    line-height: 40px;
-    padding: 0 10px;
+    height: 26px;
+    line-height: 26px;
+    padding: 0 6px; /* ✅ 内边距减半 10→6 */
     display: flex;
     flex-direction: row;
     align-content: center;
@@ -188,16 +185,17 @@ function initProperty(modelId: string, elementId: string) {
     cursor: pointer;
 }
 .collapse-icon {
-    font-size: 14px;
+    font-size: 10px; /* ✅ 折叠图标缩小14→10 */
     color: #c9d1e8;
 }
 
+/* ✅ 属性项 重中之重！高度40→24 字体14→10 左侧缩进40→20 省巨量空间 */
 .setting-item {
     background-color: #324985;
-    font-size: 14px;
-    padding-left: 40px;
-	padding-right: 10px;
-	height: 40px;
+    font-size: 10px;
+    padding-left: 20px;
+	padding-right: 4px;
+	height: 24px;
 	margin-bottom: 1px;
 	display: flex;
 	flex-direction: row;
@@ -210,33 +208,32 @@ function initProperty(modelId: string, elementId: string) {
     width: 60px;
 }
 
+/* ✅ 内容区 高度自适应头部压缩后的尺寸 + 滚动条窄化 8→4px 移动端友好 */
 .setting-content {
     background-color: #324985;
     height: calc(100vh - 10% - 40px);
     margin-left: 0px;
 	margin-right: 0px;
-	overflow-y: auto;
-	overflow: auto;
+    overflow-y: auto;
 	scrollbar-width: thin;
 	scrollbar-color: #3b5997 #324985;
-	box-sizing: content-box;
+	box-sizing: border-box;
 }
 .setting-content::-webkit-scrollbar {
-    width: 8px;
-	padding-right: 10px;
-	box-sizing: content-box;
+    width: 4px; /* ✅ 滚动条宽度减半 省横向空间 */
 	background-color: #324985;
 }
 .setting-content::-webkit-scrollbar-thumb {
     background-color: #3b5997;
-	border-radius: 4px;
+	border-radius: 2px;
 }
 .setting-content::-webkit-scrollbar-track {
     background-color: #324985;
 }
 
+/* ✅ 单行省略 适配紧凑宽度 最大宽度缩小 防溢出 */
 .line-limit-length{
-    max-width: 150px;
+    max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

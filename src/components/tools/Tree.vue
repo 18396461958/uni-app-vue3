@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
 import TreeNode from './TreeNode.vue'
 
 // 定义Props
@@ -41,5 +40,6 @@ defineEmits(['toggle-expand', 'node-click'])
 .native-tree-container {
   width: 100%;
   color: #fff;
+  font-size: 12px; /* 全局缩小字体，子元素继承，核心修改 */
 }
 </style>
