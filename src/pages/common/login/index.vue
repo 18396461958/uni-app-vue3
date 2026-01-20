@@ -10,24 +10,24 @@
         <input v-model="tel" class="input-border" placeholder="请输入账号">
         <view class="input-wrap my-40rpx flex">
           <input v-model="code" class="flex-1" placeholder="请输入密码">
-          <view>
+          <!-- <view>
             <button class="code-btn" :disabled="countDown > 0" @click="getCode">
               {{ countDown > 0 ? `${countDown}s后重新获取` : '获取验证码' }}
             </button>
-          </view>
+          </view> -->
         </view>
         <button class="login-btn" :style="[inputStyle]" @tap="submit">
           登录
         </button>
 
-        <view class="alternative">
+        <!-- <view class="alternative">
           <view class="password">
             密码登录
           </view>
           <view class="issue flex items-center">
             遇到问题
           </view>
-        </view>
+        </view> -->
       </view>
     </view>
   </view>

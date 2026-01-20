@@ -389,7 +389,7 @@ function ConnectServer(renderAddress, dataChannelAddress) {
   // 创建按钮元素
   const button = document.createElement("button");
   button.style.position = "absolute"; /* 绝对定位 */
-  button.style.top = "80px"; /* 垂直居中 */
+  button.style.bottom = "10px"; /* 垂直居中 */
   button.style.right = "15px"; /* 水平居中 */
   button.style.padding = "5px 10px";
   button.style.backgroundColor = "rgba(255, 255, 255, 0.2)"; /* 半透明背景 */
